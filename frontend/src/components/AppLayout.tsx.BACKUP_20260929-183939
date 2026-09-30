@@ -1,0 +1,944 @@
+﻿import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  BarChart3,
+  Building2,
+  ClipboardCheck,
+  FileUp,
+  Menu,
+  Stethoscope,
+  Target,
+  UploadCloud,
+  Users,
+  X,
+} from "lucide-react";
+
+import {
+  NavLink,
+  Navigate,
+  Outlet,
+  useLocation,
+} from "react-router-dom";
+
+import "./AppLayout.css";
+
+
+// ======================================================
+// ROLES
+// ======================================================
+
+type UserRole =
+  | "SUPER_ADMIN"
+  | "MASTER_ADMIN"
+  | "ADMIN"
+  | "DIRECTOR"
+  | "INCHARGE_DIRECTOR"
+  | "HO_USER";
+
+
+// ======================================================
+// STORED USER
+// ======================================================
+
+type StoredUser = {
+
+  id?: number;
+
+  name?: string;
+
+  username?: string;
+
+  role?: UserRole;
+
+  unitId?: number | null;
+
+  unit?: {
+
+    code?: string;
+
+    name?: string;
+
+  } | null;
+
+};
+
+
+// ======================================================
+// USER MANAGEMENT
+// ======================================================
+
+const USER_MANAGEMENT_ROLES: UserRole[] = [
+
+  "SUPER_ADMIN",
+
+  "MASTER_ADMIN",
+
+  "ADMIN",
+
+  "DIRECTOR",
+
+  "INCHARGE_DIRECTOR",
+
+];
+
+
+// ======================================================
+// SPECIALITY REVENUE
+// ======================================================
+
+const SPECIALITY_REVENUE_ROLES: UserRole[] = [
+
+  "SUPER_ADMIN",
+
+  "MASTER_ADMIN",
+
+  "ADMIN",
+
+  "DIRECTOR",
+
+  "INCHARGE_DIRECTOR",
+
+];
+
+
+// ======================================================
+// LM UPLOAD
+//
+// Matches current backend revenue-upload permission.
+// ======================================================
+
+const LM_UPLOAD_ROLES: UserRole[] = [
+
+  "SUPER_ADMIN",
+
+  "MASTER_ADMIN",
+
+  "ADMIN",
+
+  "HO_USER",
+
+];
+
+
+// ======================================================
+// INCHARGE DIRECTOR ROUTES
+// ======================================================
+
+const INCHARGE_DIRECTOR_ALLOWED_ROUTES = [
+
+  "/dashboard",
+
+  "/speciality-revenue",
+
+  "/revenue-trend",
+
+  "/speciality-trend",
+
+  "/users",
+
+];
+
+
+// ======================================================
+// APP LAYOUT
+// ======================================================
+
+function AppLayout() {
+
+  const location =
+    useLocation();
+
+
+  const [
+    mobileMenuOpen,
+    setMobileMenuOpen,
+  ] =
+    useState(
+      false
+    );
+
+
+  // ====================================================
+  // TOKEN
+  // ====================================================
+
+  const token =
+    localStorage.getItem(
+      "revenue_token"
+    );
+
+
+  // ====================================================
+  // STORED USER
+  // ====================================================
+
+  let storedUser:
+    StoredUser |
+    null =
+    null;
+
+
+  try {
+
+    const rawUser =
+      localStorage.getItem(
+        "revenue_user"
+      );
+
+
+    if (
+      rawUser
+    ) {
+
+      storedUser =
+        JSON.parse(
+          rawUser
+        ) as StoredUser;
+
+    }
+
+  }
+  catch {
+
+    storedUser =
+      null;
+
+  }
+
+
+  // ====================================================
+  // ROLE
+  // ====================================================
+
+  const currentRole =
+    storedUser?.role ??
+    null;
+
+
+  const isInchargeDirector =
+    currentRole ===
+    "INCHARGE_DIRECTOR";
+
+
+  // ====================================================
+  // ACCESS
+  // ====================================================
+
+  const canManageUsers =
+    Boolean(
+      currentRole &&
+      USER_MANAGEMENT_ROLES.includes(
+        currentRole
+      )
+    );
+
+
+  const canAccessSpecialityRevenue =
+    Boolean(
+      currentRole &&
+      SPECIALITY_REVENUE_ROLES.includes(
+        currentRole
+      )
+    );
+
+
+  const canAccessLmUpload =
+    Boolean(
+      currentRole &&
+      LM_UPLOAD_ROLES.includes(
+        currentRole
+      )
+    );
+
+
+  const canAccessGroupSpecialityTrend =
+    currentRole === "SUPER_ADMIN" ||
+    currentRole === "MASTER_ADMIN" ||
+    currentRole === "ADMIN" ||
+    currentRole === "DIRECTOR";
+
+  const canAccessOperationalModules =
+    !isInchargeDirector;
+
+
+  // ====================================================
+  // ESCAPE
+  // ====================================================
+
+  useEffect(
+    () => {
+
+      const handleEscape =
+        (
+          event:
+            KeyboardEvent
+        ) => {
+
+          if (
+            event.key ===
+            "Escape"
+          ) {
+
+            setMobileMenuOpen(
+              false
+            );
+
+          }
+
+        };
+
+
+      document.addEventListener(
+        "keydown",
+        handleEscape
+      );
+
+
+      if (
+        mobileMenuOpen
+      ) {
+
+        document.body.classList.add(
+          "app-menu-open"
+        );
+
+      }
+      else {
+
+        document.body.classList.remove(
+          "app-menu-open"
+        );
+
+      }
+
+
+      return () => {
+
+        document.removeEventListener(
+          "keydown",
+          handleEscape
+        );
+
+
+        document.body.classList.remove(
+          "app-menu-open"
+        );
+
+      };
+
+    },
+    [
+      mobileMenuOpen,
+    ]
+  );
+
+
+  // ====================================================
+  // LARGE SCREEN
+  // ====================================================
+
+  useEffect(
+    () => {
+
+      const handleResize =
+        () => {
+
+          if (
+            window.innerWidth >
+            1024
+          ) {
+
+            setMobileMenuOpen(
+              false
+            );
+
+          }
+
+        };
+
+
+      window.addEventListener(
+        "resize",
+        handleResize
+      );
+
+
+      return () => {
+
+        window.removeEventListener(
+          "resize",
+          handleResize
+        );
+
+      };
+
+    },
+    []
+  );
+
+
+  // ====================================================
+  // AUTH
+  // ====================================================
+
+  if (
+    !token
+  ) {
+
+    return (
+
+      <Navigate
+        to="/login"
+        replace
+      />
+
+    );
+
+  }
+
+
+  // ====================================================
+  // INCHARGE ROUTE GUARD
+  // ====================================================
+
+  if (
+    isInchargeDirector &&
+    !INCHARGE_DIRECTOR_ALLOWED_ROUTES.some(
+      (
+        route
+      ) =>
+        location.pathname ===
+          route ||
+        location.pathname.startsWith(
+          `${route}/`
+        )
+    )
+  ) {
+
+    return (
+
+      <Navigate
+        to="/dashboard"
+        replace
+      />
+
+    );
+
+  }
+
+
+  const closeMobileMenu =
+    () => {
+
+      setMobileMenuOpen(
+        false
+      );
+
+    };
+
+
+  const getNavClassName =
+    (
+      {
+        isActive,
+      }: {
+        isActive:
+          boolean;
+      }
+    ) =>
+      isActive
+        ? "app-nav-item active"
+        : "app-nav-item";
+
+
+  // ====================================================
+  // UI
+  // ====================================================
+
+  return (
+
+    <div className="app-shell">
+
+      {/* MOBILE HEADER */}
+
+      <header className="app-mobile-header">
+
+        <button
+          type="button"
+          className="app-mobile-menu-button"
+          onClick={
+            () =>
+              setMobileMenuOpen(
+                (
+                  current
+                ) =>
+                  !current
+              )
+          }
+          aria-label={
+            mobileMenuOpen
+              ? "Close navigation menu"
+              : "Open navigation menu"
+          }
+          aria-expanded={
+            mobileMenuOpen
+          }
+        >
+
+          {
+            mobileMenuOpen
+              ? (
+                <X
+                  size={22}
+                />
+              )
+              : (
+                <Menu
+                  size={22}
+                />
+              )
+          }
+
+        </button>
+
+
+        <div className="app-mobile-brand">
+
+          <div className="app-mobile-logo">
+
+            A+
+
+          </div>
+
+
+          <div>
+
+            <strong>
+
+              Revenue Report
+
+            </strong>
+
+            <span>
+
+              Aayush Group
+
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+
+      {/* OVERLAY */}
+
+      <button
+        type="button"
+        className={
+          mobileMenuOpen
+            ? "app-sidebar-overlay open"
+            : "app-sidebar-overlay"
+        }
+        onClick={
+          closeMobileMenu
+        }
+        aria-label="Close navigation"
+      />
+
+
+      {/* SIDEBAR */}
+
+      <aside
+        className={
+          mobileMenuOpen
+            ? "app-sidebar open"
+            : "app-sidebar"
+        }
+      >
+
+        <div className="app-sidebar-brand">
+
+          <div className="app-sidebar-logo">
+
+            A+
+
+          </div>
+
+
+          <div className="app-sidebar-brand-text">
+
+            <strong>
+
+              Revenue Report
+
+            </strong>
+
+            <span>
+
+              Aayush Group
+
+            </span>
+
+          </div>
+
+
+          <button
+            type="button"
+            className="app-sidebar-close"
+            onClick={
+              closeMobileMenu
+            }
+            aria-label="Close menu"
+          >
+
+            <X
+              size={20}
+            />
+
+          </button>
+
+        </div>
+
+
+        <nav className="app-sidebar-nav">
+
+          {/* DASHBOARD */}
+
+          <NavLink
+            to="/dashboard"
+            onClick={
+              closeMobileMenu
+            }
+            className={
+              getNavClassName
+            }
+          >
+
+            <BarChart3
+              size={18}
+            />
+
+            <span>
+
+              Dashboard
+
+            </span>
+
+          </NavLink>
+
+
+          {/* SPECIALITY REVENUE */}
+
+          {
+            canAccessSpecialityRevenue && (
+
+              <NavLink
+                to="/speciality-revenue"
+                onClick={
+                  closeMobileMenu
+                }
+                className={
+                  getNavClassName
+                }
+              >
+
+                <Stethoscope
+                  size={18}
+                />
+
+                <span>
+
+                  Speciality Revenue
+
+                </span>
+
+              </NavLink>
+
+            )
+          }
+
+
+          {/* LM UPLOAD */}
+
+          {
+            canAccessLmUpload && (
+
+              <NavLink
+                to="/lm-upload"
+                onClick={
+                  closeMobileMenu
+                }
+                className={
+                  getNavClassName
+                }
+              >
+
+                <FileUp
+                  size={18}
+                />
+
+                <span>
+
+                  LM Upload
+
+                </span>
+
+              </NavLink>
+
+            )
+          }
+
+
+          {/* OPERATIONAL MODULES */}
+
+          {
+            canAccessOperationalModules && (
+
+              <>
+
+                <NavLink
+                  to="/daily-upload"
+                  onClick={
+                    closeMobileMenu
+                  }
+                  className={
+                    getNavClassName
+                  }
+                >
+
+                  <UploadCloud
+                    size={18}
+                  />
+
+                  <span>
+
+                    Daily Upload
+
+                  </span>
+
+                </NavLink>
+
+
+                <NavLink
+                  to="/occupancy-upload"
+                  onClick={
+                    closeMobileMenu
+                  }
+                  className={
+                    getNavClassName
+                  }
+                >
+
+                  <Building2
+                    size={18}
+                  />
+
+                  <span>
+
+                    Bed Occupancy
+
+                  </span>
+
+                </NavLink>
+
+
+                <NavLink
+                  to="/upload-status"
+                  onClick={
+                    closeMobileMenu
+                  }
+                  className={
+                    getNavClassName
+                  }
+                >
+
+                  <ClipboardCheck
+                    size={18}
+                  />
+
+                  <span>
+
+                    Upload Status
+
+                  </span>
+
+                </NavLink>
+
+
+                <NavLink
+                  to="/targets"
+                  onClick={
+                    closeMobileMenu
+                  }
+                  className={
+                    getNavClassName
+                  }
+                >
+
+                  <Target
+                    size={18}
+                  />
+
+                  <span>
+
+                    Targets
+
+                  </span>
+
+                </NavLink>
+
+              </>
+
+            )
+          }
+          {/* REVENUE TREND */}
+
+          <NavLink
+            to="/revenue-trend"
+            onClick={
+              closeMobileMenu
+            }
+            className={
+              getNavClassName
+            }
+          >
+
+            <BarChart3
+              size={18}
+            />
+
+            <span>
+              Revenue Trend
+            </span>
+
+          </NavLink>
+
+          {/* ==================================================
+              SPECIALITY TREND
+              ================================================== */}
+
+          {
+            canAccessSpecialityRevenue && (
+
+              <NavLink
+                to="/speciality-trend"
+                onClick={
+                  closeMobileMenu
+                }
+                className={
+                  getNavClassName
+                }
+              >
+
+                <BarChart3
+                  size={18}
+                />
+
+                <span>
+
+                  Speciality Trend
+
+                </span>
+
+              </NavLink>
+
+            )
+          }
+
+
+
+
+          {/* ==================================================
+              GROUP SPECIALITY TREND
+              ================================================== */}
+
+          {
+            canAccessGroupSpecialityTrend && (
+
+              <NavLink
+                to="/group-speciality-trend"
+                onClick={
+                  closeMobileMenu
+                }
+                className={
+                  getNavClassName
+                }
+              >
+
+                <BarChart3
+                  size={18}
+                />
+
+                <span>
+                  Group Speciality Trend
+                </span>
+
+              </NavLink>
+
+            )
+          }
+
+          {/* USERS */}
+
+          {
+            canManageUsers && (
+
+              <NavLink
+                to="/users"
+                onClick={
+                  closeMobileMenu
+                }
+                className={
+                  getNavClassName
+                }
+              >
+
+                <Users
+                  size={18}
+                />
+
+                <span>
+
+                  Users
+
+                </span>
+
+              </NavLink>
+
+            )
+          }
+
+        </nav>
+
+      </aside>
+
+
+      {/* CONTENT */}
+
+      <main className="app-content">
+
+        <Outlet />
+
+      </main>
+
+    </div>
+
+  );
+
+}
+
+
+export default AppLayout;
+
+
+
+
+
+
+
+

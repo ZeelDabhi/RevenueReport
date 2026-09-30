@@ -1,0 +1,327 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ======================================================
+// ENUMS
+// ======================================================
+
+enum ReportType {
+  FTD
+  MTD
+  LMTD
+  LM
+}
+
+enum ImportStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  MASTER_ADMIN
+  ADMIN
+  DIRECTOR
+  INCHARGE_DIRECTOR
+  HO_USER
+}
+
+enum PasswordChangedBy {
+  SELF
+  ADMIN
+}
+
+// ======================================================
+// UNIT MASTER
+// ======================================================
+
+model Unit {
+  id       Int     @id @default(autoincrement())
+  code     String  @unique @db.VarChar(20)
+  name     String  @db.VarChar(150)
+  isActive Boolean @default(true)
+
+  imports RevenueImport[]
+
+  targets RevenueTarget[]
+
+  occupancies DailyOccupancy[]
+
+  users User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("units")
+}
+
+// ======================================================
+// USER MASTER
+// ======================================================
+
+model User {
+  id Int @id @default(autoincrement())
+
+  name String @db.VarChar(150)
+
+  username String @unique @db.VarChar(100)
+
+  email String? @unique @db.VarChar(150)
+
+  mobile String? @unique @db.VarChar(20)
+
+  passwordHash String @db.VarChar(255)
+
+  role UserRole @default(HO_USER)
+
+  unitId Int?
+
+  isActive Boolean @default(true)
+
+  lastLoginAt DateTime?
+
+  passwordChangedAt DateTime?
+
+  passwordChangedBy PasswordChangedBy?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  unit Unit? @relation(fields: [unitId], references: [id], onDelete: SetNull)
+
+  @@index([role])
+  @@index([unitId])
+  @@index([isActive])
+  @@map("users")
+}
+
+// ======================================================
+// REVENUE IMPORT MASTER
+// ======================================================
+
+model RevenueImport {
+  id Int @id @default(autoincrement())
+
+  unitId Int
+
+  reportType ReportType
+
+  businessDate DateTime @db.Date
+
+  fromDate DateTime @db.Date
+
+  toDate DateTime @db.Date
+
+  fileName String? @db.VarChar(255)
+
+  totalNetAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  totalNetAmountLakhs Decimal @default(0) @db.Decimal(20, 6)
+
+  status ImportStatus @default(PENDING)
+
+  errorMessage String?
+
+  rawData Json?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  departments RevenueDepartment[]
+
+  summary RevenueSummary?
+
+  @@unique([unitId, reportType, businessDate])
+  @@index([unitId])
+  @@index([businessDate])
+  @@index([reportType])
+  @@index([unitId, businessDate])
+  @@index([reportType, businessDate])
+  @@index([status, businessDate])
+  @@map("revenue_imports")
+}
+
+// ======================================================
+// REVENUE DEPARTMENT DETAILS
+// ======================================================
+
+model RevenueDepartment {
+  id Int @id @default(autoincrement())
+
+  importId Int
+
+  revenueOn String? @db.VarChar(200)
+
+  totalNetAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  revenueImport RevenueImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@index([importId])
+  @@index([revenueOn])
+  @@index([importId, revenueOn])
+  @@map("revenue_departments")
+}
+
+// ======================================================
+// REVENUE SUMMARY
+// ======================================================
+
+model RevenueSummary {
+  id Int @id @default(autoincrement())
+
+  importId Int @unique
+
+  opBillCount       Int @default(0)
+  ipBillCount       Int @default(0)
+  erBillCount       Int @default(0)
+  dcBillCount       Int @default(0)
+  pharmacyBillCount Int @default(0)
+  opticalBillCount  Int @default(0)
+
+  opBillAmount       Decimal @default(0) @db.Decimal(20, 2)
+  ipBillAmount       Decimal @default(0) @db.Decimal(20, 2)
+  erBillAmount       Decimal @default(0) @db.Decimal(20, 2)
+  dcBillAmount       Decimal @default(0) @db.Decimal(20, 2)
+  pharmacyBillAmount Decimal @default(0) @db.Decimal(20, 2)
+  opticalBillAmount  Decimal @default(0) @db.Decimal(20, 2)
+
+  opDiscountAmount       Decimal @default(0) @db.Decimal(20, 2)
+  ipDiscountAmount       Decimal @default(0) @db.Decimal(20, 2)
+  erDiscountAmount       Decimal @default(0) @db.Decimal(20, 2)
+  dcDiscountAmount       Decimal @default(0) @db.Decimal(20, 2)
+  pharmacyDiscountAmount Decimal @default(0) @db.Decimal(20, 2)
+  opticalDiscountAmount  Decimal @default(0) @db.Decimal(20, 2)
+
+  opRefundAmount       Decimal @default(0) @db.Decimal(20, 2)
+  ipRefundAmount       Decimal @default(0) @db.Decimal(20, 2)
+  erRefundAmount       Decimal @default(0) @db.Decimal(20, 2)
+  dcRefundAmount       Decimal @default(0) @db.Decimal(20, 2)
+  pharmacyRefundAmount Decimal @default(0) @db.Decimal(20, 2)
+  opticalRefundAmount  Decimal @default(0) @db.Decimal(20, 2)
+
+  opCancelCreditAmount       Decimal @default(0) @db.Decimal(20, 2)
+  ipCancelCreditAmount       Decimal @default(0) @db.Decimal(20, 2)
+  erCancelCreditAmount       Decimal @default(0) @db.Decimal(20, 2)
+  dcCancelCreditAmount       Decimal @default(0) @db.Decimal(20, 2)
+  pharmacyCancelCreditAmount Decimal @default(0) @db.Decimal(20, 2)
+  opticalCancelCreditAmount  Decimal @default(0) @db.Decimal(20, 2)
+
+  opNetAfterRefund       Decimal @default(0) @db.Decimal(20, 2)
+  ipNetAfterRefund       Decimal @default(0) @db.Decimal(20, 2)
+  erNetAfterRefund       Decimal @default(0) @db.Decimal(20, 2)
+  dcNetAfterRefund       Decimal @default(0) @db.Decimal(20, 2)
+  pharmacyNetAfterRefund Decimal @default(0) @db.Decimal(20, 2)
+  opticalNetAfterRefund  Decimal @default(0) @db.Decimal(20, 2)
+
+  grandTotalBillCount Int @default(0)
+
+  grandTotalBillAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  grandTotalDiscountAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  grandTotalRefundAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  grandTotalNetAfterRefund Decimal @default(0) @db.Decimal(20, 2)
+
+  grandTotalCancelCreditAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  finalNetAmount Decimal @default(0) @db.Decimal(20, 2)
+
+  rawSummary Json?
+
+  revenueImport RevenueImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+
+  @@map("revenue_summaries")
+}
+
+// ======================================================
+// UNIT-WISE MONTHLY TARGET
+// ======================================================
+
+model RevenueTarget {
+  id Int @id @default(autoincrement())
+
+  unitId Int
+
+  year Int
+
+  month Int
+
+  targetLakhs Decimal @default(0) @db.Decimal(20, 2)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  @@unique([unitId, year, month])
+  @@index([year, month])
+  @@index([unitId])
+  @@map("revenue_targets")
+}
+
+// ======================================================
+// MANUAL GROUP TOTAL TARGET
+// ======================================================
+
+model GroupRevenueTarget {
+  id Int @id @default(autoincrement())
+
+  year Int
+
+  month Int
+
+  groupTargetLakhs Decimal @default(0) @db.Decimal(20, 2)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([year, month])
+  @@index([year, month])
+  @@map("group_revenue_targets")
+}
+
+// ======================================================
+// DAILY BED OCCUPANCY
+// ======================================================
+
+model DailyOccupancy {
+  id Int @id @default(autoincrement())
+
+  unitId Int
+
+  occupancyDate DateTime @db.Date
+
+  occupancyCount Int @default(0)
+
+  sourceFileName String? @db.VarChar(255)
+
+  rawRowCount Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  unit Unit @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  @@unique([unitId, occupancyDate])
+  @@index([occupancyDate])
+  @@index([unitId])
+  @@index([unitId, occupancyDate])
+  @@map("daily_occupancies")
+}

@@ -1,0 +1,185 @@
+﻿import {
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
+
+import AppLayout
+  from "./components/AppLayout";
+
+import ChangePasswordPage
+  from "./pages/ChangePasswordPage.tsx";
+
+import DailyUploadPage
+  from "./pages/DailyUploadPage";
+
+import DashboardPage
+  from "./pages/DashboardPage";
+
+import LMUploadPage
+  from "./pages/LMUploadPage";
+
+import LoginPage
+  from "./pages/LoginPage";
+
+import OccupancyUploadPage
+  from "./pages/OccupancyUploadPage";
+
+import SpecialityRevenuePage
+  from "./pages/SpecialityRevenuePage";
+
+import TargetPage
+  from "./pages/TargetPage";
+
+import UploadStatusPage
+  from "./pages/UploadStatusPage";
+
+import RevenueTrendPage
+  from "./pages/RevenueTrendPage";
+
+import UserManagementPage
+  from "./pages/UserManagementPage";
+
+import SpecialityTrendPage
+  from "./pages/SpecialityTrendPage";
+
+
+function App() {
+
+  return (
+
+    <Routes>
+
+      <Route
+        path="/"
+        element={
+          <Navigate
+            to="/dashboard"
+            replace
+          />
+        }
+      />
+
+
+      <Route
+        path="/login"
+        element={
+          <LoginPage />
+        }
+      />
+
+
+      <Route
+        element={
+          <AppLayout />
+        }
+      >
+
+        <Route
+          path="/dashboard"
+          element={
+            <DashboardPage />
+          }
+        />
+
+
+        <Route
+          path="/speciality-revenue"
+          element={
+            <SpecialityRevenuePage />
+          }
+        />
+
+
+        <Route
+          path="/lm-upload"
+          element={
+            <LMUploadPage />
+          }
+        />
+
+
+        <Route
+          path="/daily-upload"
+          element={
+            <DailyUploadPage />
+          }
+        />
+
+
+        <Route
+          path="/occupancy-upload"
+          element={
+            <OccupancyUploadPage />
+          }
+        />
+
+
+        <Route
+          path="/upload-status"
+          element={
+            <UploadStatusPage />
+          }
+        />
+
+
+        <Route
+          path="/targets"
+          element={
+            <TargetPage />
+          }
+        />
+
+
+        <Route
+          path="/revenue-trend"
+          element={
+            <RevenueTrendPage />
+          }
+        />
+
+
+        <Route
+          path="/speciality-trend"
+          element={
+            <SpecialityTrendPage />
+          }
+        />
+
+
+        <Route
+          path="/users"
+          element={
+            <UserManagementPage />
+          }
+        />
+
+
+        <Route
+          path="/change-password"
+          element={
+            <ChangePasswordPage />
+          }
+        />
+
+      </Route>
+
+
+      <Route
+        path="*"
+        element={
+          <Navigate
+            to="/dashboard"
+            replace
+          />
+        }
+      />
+
+    </Routes>
+
+  );
+
+}
+
+
+export default App;

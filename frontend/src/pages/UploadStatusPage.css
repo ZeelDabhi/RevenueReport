@@ -1,0 +1,362 @@
+.upload-status-page {
+  min-height: 100vh;
+  padding: 30px;
+  background: #f3f6fb;
+  color: #172033;
+}
+
+.upload-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.upload-status-eyebrow {
+  margin: 0 0 5px;
+  color: #0877b5;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.upload-status-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+.upload-status-subtitle {
+  margin: 7px 0 0;
+  color: #7d8998;
+  font-size: 11px;
+}
+
+.upload-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-status-date {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #d6e0ea;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #56758e;
+}
+
+.upload-status-date input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #263b4d;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.upload-status-refresh {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  cursor: pointer;
+  color: #ffffff;
+  background: #087eae;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.upload-status-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upload-status-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.upload-status-summary-card {
+  padding: 17px;
+  border: 1px solid #dfe7ef;
+  border-radius: 13px;
+  background: #ffffff;
+  box-shadow:
+    0 5px 18px
+    rgba(26, 45, 70, 0.035);
+}
+
+.upload-status-summary-card p {
+  margin: 0 0 7px;
+  color: #8491a0;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.upload-status-summary-card strong {
+  display: block;
+  color: #1e354b;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.upload-status-summary-card span {
+  display: inline-block;
+  margin-top: 7px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.upload-status-summary-card span.complete {
+  color: #14845b;
+}
+
+.upload-status-summary-card span.pending {
+  color: #d18b26;
+}
+
+.upload-status-type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.upload-status-type-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: 1px solid #e1e8ef;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.upload-status-type-card p {
+  margin: 0 0 3px;
+  color: #8491a0;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.upload-status-type-card strong {
+  color: #263d52;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.upload-status-ok {
+  color: #159061;
+}
+
+.upload-status-not-ok {
+  color: #d16a64;
+}
+
+.upload-status-table-card {
+  overflow: hidden;
+  border: 1px solid #dfe7ef;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow:
+    0 7px 24px
+    rgba(28, 47, 71, 0.04);
+}
+
+.upload-status-table-heading {
+  padding: 16px 18px;
+  border-bottom: 1px solid #e8edf2;
+}
+
+.upload-status-table-heading h2 {
+  margin: 0 0 3px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.upload-status-table-heading p {
+  margin: 0;
+  color: #8995a3;
+  font-size: 9px;
+}
+
+.upload-status-table-wrap {
+  overflow-x: auto;
+}
+
+.upload-status-table-wrap table {
+  width: 100%;
+  min-width: 800px;
+  border-collapse: collapse;
+}
+
+.upload-status-table-wrap th {
+  padding: 11px 14px;
+  text-align: center;
+  color: #748291;
+  background: #f7f9fc;
+  border-bottom: 1px solid #e3e9ef;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+
+.upload-status-table-wrap th:first-child {
+  text-align: left;
+}
+
+.upload-status-table-wrap td {
+  height: 56px;
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 1px solid #edf1f5;
+  color: #344658;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.upload-status-table-wrap td:first-child {
+  text-align: left;
+}
+
+.upload-status-unit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.upload-status-unit > span {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  color: #0876ad;
+  background: #eaf5fc;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.upload-status-unit strong {
+  color: #293d50;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.upload-status-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.upload-status-file.uploaded {
+  color: #14845b;
+}
+
+.upload-status-file.missing {
+  color: #c65b55;
+}
+
+.upload-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.upload-status-badge.complete {
+  color: #14845b;
+  background: #ecf8f2;
+}
+
+.upload-status-badge.pending {
+  color: #c65b55;
+  background: #fff0ef;
+}
+
+.upload-status-loading {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #748291;
+  font-size: 11px;
+}
+
+.upload-status-error {
+  margin-bottom: 15px;
+  padding: 11px 13px;
+  border: 1px solid #efc4c4;
+  border-radius: 9px;
+  color: #bc3535;
+  background: #fff4f4;
+  font-size: 11px;
+}
+
+.upload-status-spin {
+  animation:
+    upload-status-spin
+    0.8s
+    linear
+    infinite;
+}
+
+@keyframes upload-status-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 950px) {
+  .upload-status-summary,
+  .upload-status-type-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 650px) {
+  .upload-status-page {
+    padding: 20px 15px;
+  }
+
+  .upload-status-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .upload-status-actions {
+    width: 100%;
+  }
+
+  .upload-status-date {
+    flex: 1;
+  }
+
+  .upload-status-summary,
+  .upload-status-type-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,1821 @@
+.lm-upload-page {
+
+  min-height: 100%;
+
+  padding: 24px;
+
+
+
+  background: #f3f8f9;
+
+  color: #153846;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   PAGE HEADER
+
+   ===================================================== */
+
+
+
+.lm-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+
+
+  gap: 20px;
+
+
+
+  max-width: 900px;
+
+
+
+  margin:
+
+    0 auto
+
+    18px;
+
+}
+
+
+
+
+
+.lm-header p {
+
+  margin: 0 0 4px;
+
+
+
+  color: #008e92;
+
+
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+
+
+  letter-spacing: 0.07em;
+
+  text-transform: uppercase;
+
+}
+
+
+
+
+
+.lm-header h1 {
+
+  margin: 0;
+
+
+
+  color: #153846;
+
+
+
+  font-size: 26px;
+
+  font-weight: 900;
+
+}
+
+
+
+
+
+.lm-header span {
+
+  display: block;
+
+
+
+  margin-top: 5px;
+
+
+
+  color: #71868e;
+
+
+
+  font-size: 13px;
+
+}
+
+
+
+
+
+.lm-header-icon {
+
+  width: 48px;
+
+  height: 48px;
+
+
+
+  flex-shrink: 0;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  border-radius: 14px;
+
+
+
+  background: #e7f7f5;
+
+  color: #008e92;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   MAIN CARD
+
+   ===================================================== */
+
+
+
+.lm-upload-card {
+
+  width: 100%;
+
+  max-width: 900px;
+
+
+
+  margin: 0 auto;
+
+
+
+  overflow: visible;
+
+
+
+  padding: 22px;
+
+
+
+  border: 1px solid #b5cbd1;
+
+  border-radius: 14px;
+
+
+
+  background: #ffffff;
+
+
+
+  box-shadow:
+
+    0 5px 18px
+
+    rgba(
+
+      24,
+
+      70,
+
+      82,
+
+      0.045
+
+    );
+
+}
+
+
+
+
+
+/* =====================================================
+
+   CARD HEADING
+
+   ===================================================== */
+
+
+
+.lm-card-heading {
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 11px;
+
+
+
+  padding-bottom: 17px;
+
+
+
+  margin-bottom: 18px;
+
+
+
+  border-bottom: 1px solid #e2eaec;
+
+}
+
+
+
+
+
+.lm-card-heading-icon {
+
+  width: 38px;
+
+  height: 38px;
+
+
+
+  flex-shrink: 0;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  border-radius: 10px;
+
+
+
+  background: #eaf8f6;
+
+  color: #008e92;
+
+}
+
+
+
+
+
+.lm-card-heading h2 {
+
+  margin: 0;
+
+
+
+  color: #153846;
+
+
+
+  font-size: 17px;
+
+  font-weight: 900;
+
+}
+
+
+
+
+
+.lm-card-heading p {
+
+  margin: 3px 0 0;
+
+
+
+  color: #798d94;
+
+
+
+  font-size: 11px;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   CONTROLS
+
+   ===================================================== */
+
+
+
+.lm-controls {
+
+  display: flex;
+
+  align-items: flex-end;
+
+
+
+  gap: 12px;
+
+}
+
+
+
+
+
+.lm-field {
+
+  position: relative;
+
+
+
+  display: flex;
+
+  flex-direction: column;
+
+
+
+  gap: 6px;
+
+}
+
+
+
+
+
+.lm-field > label,
+
+.lm-upload-section > label {
+
+  color: #678089;
+
+
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+
+
+  letter-spacing: 0.05em;
+
+}
+
+
+
+
+
+.lm-unit-field {
+
+  width: 145px;
+
+}
+
+
+
+
+
+.lm-month-field {
+
+  width: 220px;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   UNIT SELECT
+
+   ===================================================== */
+
+
+
+.lm-custom-select {
+
+  position: relative;
+
+
+
+  width: 145px;
+
+}
+
+
+
+
+
+.lm-select-trigger {
+
+  width: 145px;
+
+  height: 40px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  padding: 0 10px;
+
+
+
+  border: 1px solid #a9c2c8;
+
+  border-radius: 8px;
+
+
+
+  background: #ffffff;
+
+  color: #163b47;
+
+
+
+  cursor: pointer;
+
+
+
+  transition:
+
+    border-color 0.15s ease,
+
+    box-shadow 0.15s ease;
+
+}
+
+
+
+
+
+.lm-select-trigger:hover {
+
+  border-color: #56a8ad;
+
+}
+
+
+
+
+
+.lm-select-trigger.open {
+
+  border-color: #008e92;
+
+
+
+  box-shadow:
+
+    0 0 0 2px
+
+    rgba(
+
+      0,
+
+      142,
+
+      146,
+
+      0.08
+
+    );
+
+}
+
+
+
+
+
+.lm-select-trigger > svg:first-child {
+
+  color: #008e92;
+
+}
+
+
+
+
+
+.lm-select-trigger strong {
+
+  flex: 1;
+
+
+
+  text-align: left;
+
+
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+}
+
+
+
+
+
+.lm-select-chevron {
+
+  color: #71888f;
+
+
+
+  transition:
+
+    transform 0.16s ease;
+
+}
+
+
+
+
+
+.lm-select-chevron.open {
+
+  transform: rotate(180deg);
+
+}
+
+
+
+
+
+/* =====================================================
+
+   UNIT POPUP
+
+   ===================================================== */
+
+
+
+.lm-select-menu {
+
+  position: absolute;
+
+
+
+  top: calc(100% + 5px);
+
+  left: 0;
+
+
+
+  z-index: 100;
+
+
+
+  width: 205px;
+
+
+
+  padding: 8px;
+
+
+
+  border: 1px solid #c3d5d9;
+
+  border-radius: 10px;
+
+
+
+  background: #ffffff;
+
+
+
+  box-shadow:
+
+    0 12px 28px
+
+    rgba(
+
+      25,
+
+      67,
+
+      78,
+
+      0.16
+
+    );
+
+}
+
+
+
+
+
+.lm-select-menu-label {
+
+  padding: 1px 2px 7px;
+
+
+
+  color: #83969c;
+
+
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+
+}
+
+
+
+
+
+.lm-unit-grid {
+
+  display: grid;
+
+
+
+  grid-template-columns:
+
+    repeat(
+
+      4,
+
+      1fr
+
+    );
+
+
+
+  gap: 5px;
+
+}
+
+
+
+
+
+.lm-unit-option {
+
+  height: 34px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  gap: 2px;
+
+
+
+  padding: 0 4px;
+
+
+
+  border: 1px solid #dce7e9;
+
+  border-radius: 7px;
+
+
+
+  background: #f8fbfc;
+
+  color: #47656e;
+
+
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+
+
+  cursor: pointer;
+
+
+
+  transition:
+
+    background 0.15s ease,
+
+    border-color 0.15s ease,
+
+    color 0.15s ease;
+
+}
+
+
+
+
+
+.lm-unit-option:hover {
+
+  border-color: #8ac2c5;
+
+
+
+  background: #eff9f8;
+
+  color: #007e83;
+
+}
+
+
+
+
+
+.lm-unit-option.active {
+
+  border-color: #008e92;
+
+
+
+  background: #008e92;
+
+  color: #ffffff;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   MONTH CONTROL
+
+   ===================================================== */
+
+
+
+.lm-month-control {
+
+  width: 220px;
+
+  height: 40px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 8px;
+
+
+
+  padding: 0 10px;
+
+
+
+  border: 1px solid #a9c2c8;
+
+  border-radius: 8px;
+
+
+
+  background: #ffffff;
+
+  color: #008e92;
+
+}
+
+
+
+
+
+.lm-month-control input {
+
+  width: 100%;
+
+
+
+  border: 0;
+
+  outline: 0;
+
+
+
+  background: transparent;
+
+  color: #163b47;
+
+
+
+  font-size: 12px;
+
+  font-weight: 800;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   PERIOD BAR
+
+   ===================================================== */
+
+
+
+.lm-period-bar {
+
+  min-height: 54px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 18px;
+
+
+
+  margin-top: 16px;
+
+
+
+  padding: 10px 14px;
+
+
+
+  border: 1px solid #d7e4e7;
+
+  border-radius: 9px;
+
+
+
+  background: #f7fbfb;
+
+}
+
+
+
+
+
+.lm-period-bar > div {
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 7px;
+
+}
+
+
+
+
+
+.lm-period-bar span {
+
+  color: #7c9198;
+
+
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+}
+
+
+
+
+
+.lm-period-bar strong {
+
+  color: #173d49;
+
+
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+}
+
+
+
+
+
+.lm-period-divider {
+
+  width: 1px;
+
+  height: 22px;
+
+
+
+  background: #d5e2e5;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   UPLOAD SECTION
+
+   ===================================================== */
+
+
+
+.lm-upload-section {
+
+  margin-top: 18px;
+
+}
+
+
+
+
+
+.lm-file-picker {
+
+  min-height: 92px;
+
+
+
+  margin-top: 7px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 12px;
+
+
+
+  padding: 15px;
+
+
+
+  border: 1px dashed #8ab5bd;
+
+  border-radius: 10px;
+
+
+
+  background: #f9fcfc;
+
+
+
+  cursor: pointer;
+
+
+
+  transition:
+
+    border-color 0.15s ease,
+
+    background 0.15s ease;
+
+}
+
+
+
+
+
+.lm-file-picker:hover {
+
+  border-color: #008e92;
+
+
+
+  background: #f3fbfa;
+
+}
+
+
+
+
+
+.lm-file-picker input {
+
+  display: none;
+
+}
+
+
+
+
+
+.lm-file-icon {
+
+  width: 42px;
+
+  height: 42px;
+
+
+
+  flex-shrink: 0;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  border-radius: 10px;
+
+
+
+  background: #e6f7f5;
+
+  color: #008e92;
+
+}
+
+
+
+
+
+.lm-file-copy {
+
+  min-width: 0;
+
+
+
+  flex: 1;
+
+
+
+  display: flex;
+
+  flex-direction: column;
+
+
+
+  gap: 3px;
+
+}
+
+
+
+
+
+.lm-file-copy strong {
+
+  color: #163b47;
+
+
+
+  font-size: 12px;
+
+  font-weight: 900;
+
+}
+
+
+
+
+
+.lm-file-copy span {
+
+  color: #83969c;
+
+
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+}
+
+
+
+
+
+.lm-browse-button {
+
+  flex-shrink: 0;
+
+
+
+  padding: 8px 13px;
+
+
+
+  border-radius: 8px;
+
+
+
+  background: #e4f5f3;
+
+  color: #007f84;
+
+
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   SELECTED FILE
+
+   ===================================================== */
+
+
+
+.lm-selected-file {
+
+  min-height: 66px;
+
+
+
+  margin-top: 7px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 11px;
+
+
+
+  padding: 11px 13px;
+
+
+
+  border: 1px solid #a8d7cf;
+
+  border-radius: 10px;
+
+
+
+  background: #f2fbf8;
+
+}
+
+
+
+
+
+.lm-selected-file-icon {
+
+  width: 38px;
+
+  height: 38px;
+
+
+
+  flex-shrink: 0;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  border-radius: 9px;
+
+
+
+  background: #dff3ed;
+
+  color: #087b69;
+
+}
+
+
+
+
+
+.lm-selected-file-copy {
+
+  min-width: 0;
+
+
+
+  flex: 1;
+
+
+
+  display: flex;
+
+  flex-direction: column;
+
+
+
+  gap: 3px;
+
+}
+
+
+
+
+
+.lm-selected-file-copy strong {
+
+  overflow: hidden;
+
+
+
+  color: #153846;
+
+
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+}
+
+
+
+
+
+.lm-selected-file-copy span {
+
+  color: #21866f;
+
+
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+}
+
+
+
+
+
+.lm-remove-file {
+
+  width: 31px;
+
+  height: 31px;
+
+
+
+  flex-shrink: 0;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  border: 0;
+
+  border-radius: 8px;
+
+
+
+  background: transparent;
+
+  color: #6e858c;
+
+
+
+  cursor: pointer;
+
+}
+
+
+
+
+
+.lm-remove-file:hover {
+
+  background: #e9f1f2;
+
+  color: #a33e3e;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   MESSAGE
+
+   ===================================================== */
+
+
+
+.lm-message {
+
+  margin-top: 13px;
+
+
+
+  padding: 10px 12px;
+
+
+
+  border-radius: 8px;
+
+
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+}
+
+
+
+
+
+.lm-message.success {
+
+  display: flex;
+
+  align-items: center;
+
+
+
+  gap: 7px;
+
+
+
+  border: 1px solid #a8d7cf;
+
+
+
+  background: #effaf6;
+
+  color: #08745f;
+
+}
+
+
+
+
+
+.lm-message.error {
+
+  border: 1px solid #efb8b8;
+
+
+
+  background: #fff3f3;
+
+  color: #a12f2f;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   FOOTER
+
+   ===================================================== */
+
+
+
+.lm-card-footer {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+
+
+  gap: 16px;
+
+
+
+  padding-top: 17px;
+
+
+
+  margin-top: 18px;
+
+
+
+  border-top: 1px solid #e2eaec;
+
+}
+
+
+
+
+
+.lm-footer-note {
+
+  color: #7b9097;
+
+
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+}
+
+
+
+
+
+.lm-upload-button {
+
+  min-width: 175px;
+
+  height: 40px;
+
+
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+
+
+  gap: 7px;
+
+
+
+  padding: 0 16px;
+
+
+
+  border: 0;
+
+  border-radius: 8px;
+
+
+
+  background: #008e92;
+
+  color: #ffffff;
+
+
+
+  font-size: 11px;
+
+  font-weight: 900;
+
+
+
+  cursor: pointer;
+
+}
+
+
+
+
+
+.lm-upload-button:hover:not(:disabled) {
+
+  background: #007c80;
+
+}
+
+
+
+
+
+.lm-upload-button:disabled {
+
+  opacity: 0.45;
+
+
+
+  cursor: not-allowed;
+
+}
+
+
+
+
+
+/* =====================================================
+
+   TABLET
+
+   ===================================================== */
+
+
+
+@media (
+
+  max-width: 800px
+
+) {
+
+
+
+  .lm-header,
+
+  .lm-upload-card {
+
+    max-width: 100%;
+
+  }
+
+
+
+}
+
+
+
+
+
+/* =====================================================
+
+   MOBILE
+
+   ===================================================== */
+
+
+
+@media (
+
+  max-width: 620px
+
+) {
+
+
+
+  .lm-upload-page {
+
+    padding: 14px;
+
+  }
+
+
+
+
+
+  .lm-header {
+
+    align-items: flex-start;
+
+  }
+
+
+
+
+
+  .lm-header h1 {
+
+    font-size: 22px;
+
+  }
+
+
+
+
+
+  .lm-upload-card {
+
+    padding: 15px;
+
+  }
+
+
+
+
+
+  .lm-controls {
+
+    align-items: stretch;
+
+
+
+    flex-direction: column;
+
+  }
+
+
+
+
+
+  .lm-unit-field,
+
+  .lm-month-field,
+
+  .lm-custom-select,
+
+  .lm-select-trigger,
+
+  .lm-month-control {
+
+    width: 100%;
+
+  }
+
+
+
+
+
+  .lm-period-bar {
+
+    align-items: flex-start;
+
+    flex-direction: column;
+
+
+
+    gap: 7px;
+
+  }
+
+
+
+
+
+  .lm-period-divider {
+
+    display: none;
+
+  }
+
+
+
+
+
+  .lm-file-picker {
+
+    align-items: flex-start;
+
+
+
+    flex-wrap: wrap;
+
+  }
+
+
+
+
+
+  .lm-browse-button {
+
+    width: 100%;
+
+
+
+    text-align: center;
+
+  }
+
+
+
+
+
+  .lm-card-footer {
+
+    align-items: stretch;
+
+
+
+    flex-direction: column;
+
+  }
+
+
+
+
+
+  .lm-upload-button {
+
+    width: 100%;
+
+  }
+
+
+
+}
+
+/* =====================================================
+   T-1 MONTH INFO
+   ===================================================== */
+
+.lm-t1-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+
+  border: 1px solid #cfe3e6;
+  border-radius: 8px;
+
+  background: #f7fbfb;
+  color: #5f7b84;
+
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.lm-t1-note strong {
+  flex-shrink: 0;
+
+  color: #008e92;
+  font-weight: 900;
+}
+
+.lm-t1-note span {
+  font-weight: 700;
+}
+
+@media (
+  max-width: 620px
+) {
+
+  .lm-t1-note {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+}
