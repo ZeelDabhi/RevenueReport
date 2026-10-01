@@ -52,6 +52,7 @@ type RevenueItem = {
   totalNetAmount: number;
   valueLakhs: number;
   available: boolean;
+  updatedAt: string | null;
 };
 
 
@@ -74,6 +75,7 @@ type OccupancyItem = {
   occupancyDate: string | null;
   available: boolean;
   sourceFileName: string | null;
+  updatedAt: string | null;
 };
 
 
