@@ -6,8 +6,6 @@
 
 } from "react";
 
-
-
 import {
 
   BarChart3,
@@ -17,9 +15,6 @@ import {
   ClipboardCheck,
 
   FileUp,
-
-  KeyRound,
-
   Menu,
 
   Stethoscope,
@@ -34,8 +29,6 @@ import {
 
 } from "lucide-react";
 
-
-
 import {
 
   NavLink,
@@ -48,21 +41,13 @@ import {
 
 } from "react-router-dom";
 
-
-
 import "./AppLayout.css";
-
-
-
-
 
 // ======================================================
 
 // ROLES
 
 // ======================================================
-
-
 
 type UserRole =
 
@@ -78,63 +63,33 @@ type UserRole =
 
   | "HO_USER";
 
-
-
-
-
 // ======================================================
 
 // STORED USER
 
 // ======================================================
 
-
-
 type StoredUser = {
-
-
 
   id?: number;
 
-
-
   name?: string;
-
-
 
   username?: string;
 
-
-
   role?: UserRole;
-
-
 
   unitId?: number | null;
 
-
-
   unit?: {
-
-
 
     code?: string;
 
-
-
     name?: string;
-
-
 
   } | null;
 
-
-
 };
-
-
-
-
 
 // ======================================================
 
@@ -142,37 +97,19 @@ type StoredUser = {
 
 // ======================================================
 
-
-
 const USER_MANAGEMENT_ROLES: UserRole[] = [
-
-
 
   "SUPER_ADMIN",
 
-
-
   "MASTER_ADMIN",
-
-
 
   "ADMIN",
 
-
-
   "DIRECTOR",
-
-
 
   "INCHARGE_DIRECTOR",
 
-
-
 ];
-
-
-
-
 
 // ======================================================
 
@@ -180,37 +117,19 @@ const USER_MANAGEMENT_ROLES: UserRole[] = [
 
 // ======================================================
 
-
-
 const SPECIALITY_REVENUE_ROLES: UserRole[] = [
-
-
 
   "SUPER_ADMIN",
 
-
-
   "MASTER_ADMIN",
-
-
 
   "ADMIN",
 
-
-
   "DIRECTOR",
-
-
 
   "INCHARGE_DIRECTOR",
 
-
-
 ];
-
-
-
-
 
 // ======================================================
 
@@ -222,33 +141,17 @@ const SPECIALITY_REVENUE_ROLES: UserRole[] = [
 
 // ======================================================
 
-
-
 const LM_UPLOAD_ROLES: UserRole[] = [
-
-
 
   "SUPER_ADMIN",
 
-
-
   "MASTER_ADMIN",
-
-
 
   "ADMIN",
 
-
-
   "HO_USER",
 
-
-
 ];
-
-
-
-
 
 // ======================================================
 
@@ -256,41 +159,18 @@ const LM_UPLOAD_ROLES: UserRole[] = [
 
 // ======================================================
 
-
-
 const INCHARGE_DIRECTOR_ALLOWED_ROUTES = [
-
-
 
   "/dashboard",
 
-
-
   "/speciality-revenue",
-
-
 
   "/revenue-trend",
 
-
-
   "/speciality-trend",
 
-
-
   "/users",
-
-
-
-  "/change-password",
-
-
-
 ];
-
-
-
-
 
 // ======================================================
 
@@ -298,19 +178,11 @@ const INCHARGE_DIRECTOR_ALLOWED_ROUTES = [
 
 // ======================================================
 
-
-
 function AppLayout() {
-
-
 
   const location =
 
     useLocation();
-
-
-
-
 
   const [
 
@@ -326,17 +198,11 @@ function AppLayout() {
 
     );
 
-
-
-
-
   // ====================================================
 
   // TOKEN
 
   // ====================================================
-
-
 
   const token =
 
@@ -346,17 +212,11 @@ function AppLayout() {
 
     );
 
-
-
-
-
   // ====================================================
 
   // STORED USER
 
   // ====================================================
-
-
 
   let storedUser:
 
@@ -366,13 +226,7 @@ function AppLayout() {
 
     null;
 
-
-
-
-
   try {
-
-
 
     const rawUser =
 
@@ -382,17 +236,11 @@ function AppLayout() {
 
       );
 
-
-
-
-
     if (
 
       rawUser
 
     ) {
-
-
 
       storedUser =
 
@@ -402,29 +250,17 @@ function AppLayout() {
 
         ) as StoredUser;
 
-
-
     }
-
-
 
   }
 
   catch {
 
-
-
     storedUser =
 
       null;
 
-
-
   }
-
-
-
-
 
   // ====================================================
 
@@ -432,17 +268,11 @@ function AppLayout() {
 
   // ====================================================
 
-
-
   const currentRole =
 
     storedUser?.role ??
 
     null;
-
-
-
-
 
   const isInchargeDirector =
 
@@ -450,17 +280,11 @@ function AppLayout() {
 
     "INCHARGE_DIRECTOR";
 
-
-
-
-
   // ====================================================
 
   // ACCESS
 
   // ====================================================
-
-
 
   const canManageUsers =
 
@@ -476,10 +300,6 @@ function AppLayout() {
 
     );
 
-
-
-
-
   const canAccessSpecialityRevenue =
 
     Boolean(
@@ -493,10 +313,6 @@ function AppLayout() {
       )
 
     );
-
-
-
-
 
   const canAccessLmUpload =
 
@@ -516,23 +332,15 @@ const canAccessOperationalModules =
 
     !isInchargeDirector;
 
-
-
-
-
   // ====================================================
 
   // ESCAPE
 
   // ====================================================
 
-
-
   useEffect(
 
     () => {
-
-
 
       const handleEscape =
 
@@ -544,8 +352,6 @@ const canAccessOperationalModules =
 
         ) => {
 
-
-
           if (
 
             event.key ===
@@ -554,25 +360,15 @@ const canAccessOperationalModules =
 
           ) {
 
-
-
             setMobileMenuOpen(
 
               false
 
             );
 
-
-
           }
 
-
-
         };
-
-
-
-
 
       document.addEventListener(
 
@@ -582,17 +378,11 @@ const canAccessOperationalModules =
 
       );
 
-
-
-
-
       if (
 
         mobileMenuOpen
 
       ) {
-
-
 
         document.body.classList.add(
 
@@ -600,13 +390,9 @@ const canAccessOperationalModules =
 
         );
 
-
-
       }
 
       else {
-
-
 
         document.body.classList.remove(
 
@@ -614,17 +400,9 @@ const canAccessOperationalModules =
 
         );
 
-
-
       }
 
-
-
-
-
       return () => {
-
-
 
         document.removeEventListener(
 
@@ -634,21 +412,13 @@ const canAccessOperationalModules =
 
         );
 
-
-
-
-
         document.body.classList.remove(
 
           "app-menu-open"
 
         );
 
-
-
       };
-
-
 
     },
 
@@ -660,29 +430,19 @@ const canAccessOperationalModules =
 
   );
 
-
-
-
-
   // ====================================================
 
   // LARGE SCREEN
 
   // ====================================================
 
-
-
   useEffect(
 
     () => {
 
-
-
       const handleResize =
 
         () => {
-
-
 
           if (
 
@@ -692,25 +452,15 @@ const canAccessOperationalModules =
 
           ) {
 
-
-
             setMobileMenuOpen(
 
               false
 
             );
 
-
-
           }
 
-
-
         };
-
-
-
-
 
       window.addEventListener(
 
@@ -720,13 +470,7 @@ const canAccessOperationalModules =
 
       );
 
-
-
-
-
       return () => {
-
-
 
         window.removeEventListener(
 
@@ -736,11 +480,7 @@ const canAccessOperationalModules =
 
         );
 
-
-
       };
-
-
 
     },
 
@@ -748,17 +488,11 @@ const canAccessOperationalModules =
 
   );
 
-
-
-
-
   // ====================================================
 
   // AUTH
 
   // ====================================================
-
-
 
   if (
 
@@ -766,11 +500,7 @@ const canAccessOperationalModules =
 
   ) {
 
-
-
     return (
-
-
 
       <Navigate
 
@@ -780,25 +510,15 @@ const canAccessOperationalModules =
 
       />
 
-
-
     );
 
-
-
   }
-
-
-
-
 
   // ====================================================
 
   // INCHARGE ROUTE GUARD
 
   // ====================================================
-
-
 
   if (
 
@@ -826,11 +546,7 @@ const canAccessOperationalModules =
 
   ) {
 
-
-
     return (
-
-
 
       <Navigate
 
@@ -840,23 +556,13 @@ const canAccessOperationalModules =
 
       />
 
-
-
     );
 
-
-
   }
-
-
-
-
 
   const closeMobileMenu =
 
     () => {
-
-
 
       setMobileMenuOpen(
 
@@ -864,13 +570,7 @@ const canAccessOperationalModules =
 
       );
 
-
-
     };
-
-
-
-
 
   const getNavClassName =
 
@@ -896,33 +596,19 @@ const canAccessOperationalModules =
 
         : "app-nav-item";
 
-
-
-
-
   // ====================================================
 
   // UI
 
   // ====================================================
 
-
-
   return (
-
-
 
     <div className="app-shell">
 
-
-
       {/* MOBILE HEADER */}
 
-
-
       <header className="app-mobile-header">
-
-
 
         <button
 
@@ -966,8 +652,6 @@ const canAccessOperationalModules =
 
         >
 
-
-
           {
 
             mobileMenuOpen
@@ -994,77 +678,37 @@ const canAccessOperationalModules =
 
           }
 
-
-
         </button>
-
-
-
-
 
         <div className="app-mobile-brand">
 
-
-
           <div className="app-mobile-logo">
-
-
 
             A+
 
-
-
           </div>
-
-
-
-
 
           <div>
 
-
-
             <strong>
-
-
 
               Revenue Report
 
-
-
             </strong>
-
-
 
             <span>
 
-
-
               Aayush Group
-
-
 
             </span>
 
-
-
           </div>
-
-
 
         </div>
 
-
-
       </header>
 
-
-
-
-
       {/* OVERLAY */}
-
-
 
       <button
 
@@ -1090,13 +734,7 @@ const canAccessOperationalModules =
 
       />
 
-
-
-
-
       {/* SIDEBAR */}
-
-
 
       <aside
 
@@ -1112,59 +750,29 @@ const canAccessOperationalModules =
 
       >
 
-
-
         <div className="app-sidebar-brand">
-
-
 
           <div className="app-sidebar-logo">
 
-
-
             A+
 
-
-
           </div>
-
-
-
-
 
           <div className="app-sidebar-brand-text">
 
-
-
             <strong>
-
-
 
               Revenue Report
 
-
-
             </strong>
-
-
 
             <span>
 
-
-
               Aayush Group
-
-
 
             </span>
 
-
-
           </div>
-
-
-
-
 
           <button
 
@@ -1182,33 +790,19 @@ const canAccessOperationalModules =
 
           >
 
-
-
             <X
 
               size={20}
 
             />
 
-
-
           </button>
-
-
 
         </div>
 
-
-
-
-
         <nav className="app-sidebar-nav">
 
-
-
           {/* DASHBOARD */}
-
-
 
           <NavLink
 
@@ -1228,43 +822,25 @@ const canAccessOperationalModules =
 
           >
 
-
-
             <BarChart3
 
               size={18}
 
             />
 
-
-
             <span>
-
-
 
               Dashboard
 
-
-
             </span>
-
-
 
           </NavLink>
 
-
-
-
-
           {/* SPECIALITY REVENUE */}
-
-
 
           {
 
             canAccessSpecialityRevenue && (
-
-
 
               <NavLink
 
@@ -1284,49 +860,29 @@ const canAccessOperationalModules =
 
               >
 
-
-
                 <Stethoscope
 
                   size={18}
 
                 />
 
-
-
                 <span>
-
-
 
                   Speciality Revenue
 
-
-
                 </span>
 
-
-
               </NavLink>
-
-
 
             )
 
           }
 
-
-
-
-
           {/* LM UPLOAD */}
-
-
 
           {
 
             canAccessLmUpload && (
-
-
 
               <NavLink
 
@@ -1346,53 +902,31 @@ const canAccessOperationalModules =
 
               >
 
-
-
                 <FileUp
 
                   size={18}
 
                 />
 
-
-
                 <span>
-
-
 
                   LM Upload
 
-
-
                 </span>
 
-
-
               </NavLink>
-
-
 
             )
 
           }
 
-
-
-
-
           {/* OPERATIONAL MODULES */}
-
-
 
           {
 
             canAccessOperationalModules && (
 
-
-
               <>
-
-
 
                 <NavLink
 
@@ -1412,33 +946,19 @@ const canAccessOperationalModules =
 
                 >
 
-
-
                   <UploadCloud
 
                     size={18}
 
                   />
 
-
-
                   <span>
-
-
 
                     Daily Upload
 
-
-
                   </span>
 
-
-
                 </NavLink>
-
-
-
-
 
                 <NavLink
 
@@ -1458,33 +978,19 @@ const canAccessOperationalModules =
 
                 >
 
-
-
                   <Building2
 
                     size={18}
 
                   />
 
-
-
                   <span>
-
-
 
                     Bed Occupancy
 
-
-
                   </span>
 
-
-
                 </NavLink>
-
-
-
-
 
                 <NavLink
 
@@ -1504,33 +1010,19 @@ const canAccessOperationalModules =
 
                 >
 
-
-
                   <ClipboardCheck
 
                     size={18}
 
                   />
 
-
-
                   <span>
-
-
 
                     Upload Status
 
-
-
                   </span>
 
-
-
                 </NavLink>
-
-
-
-
 
                 <NavLink
 
@@ -1550,43 +1042,27 @@ const canAccessOperationalModules =
 
                 >
 
-
-
                   <Target
 
                     size={18}
 
                   />
 
-
-
                   <span>
-
-
 
                     Targets
 
-
-
                   </span>
-
-
 
                 </NavLink>
 
-
-
               </>
-
-
 
             )
 
           }
 
           {/* REVENUE TREND */}
-
-
 
           <NavLink
 
@@ -1606,15 +1082,11 @@ const canAccessOperationalModules =
 
           >
 
-
-
             <BarChart3
 
               size={18}
 
             />
-
-
 
             <span>
 
@@ -1622,11 +1094,7 @@ const canAccessOperationalModules =
 
             </span>
 
-
-
           </NavLink>
-
-
 
           {/* ==================================================
 
@@ -1634,13 +1102,9 @@ const canAccessOperationalModules =
 
               ================================================== */}
 
-
-
           {
 
             canAccessSpecialityRevenue && (
-
-
 
               <NavLink
 
@@ -1660,47 +1124,29 @@ const canAccessOperationalModules =
 
               >
 
-
-
                 <BarChart3
 
                   size={18}
 
                 />
 
-
-
                 <span>
-
-
 
                   Speciality Trend
 
-
-
                 </span>
 
-
-
               </NavLink>
-
-
 
             )
 
           }
 
-
-
           {/* USERS */}
-
-
 
           {
 
             canManageUsers && (
-
-
 
               <NavLink
 
@@ -1720,142 +1166,40 @@ const canAccessOperationalModules =
 
               >
 
-
-
                 <Users
 
                   size={18}
 
                 />
 
-
-
                 <span>
-
-
 
                   Users
 
-
-
                 </span>
 
-
-
               </NavLink>
-
-
 
             )
 
           }
 
-
-
-          {/* CHANGE PASSWORD */}
-
-
-
-          <NavLink
-
-            to="/change-password"
-
-            onClick={
-
-              closeMobileMenu
-
-            }
-
-            className={
-
-              getNavClassName
-
-            }
-
-          >
-
-
-
-            <KeyRound
-
-              size={18}
-
-            />
-
-
-
-            <span>
-
-
-
-              Change Password
-
-
-
-            </span>
-
-
-
-          </NavLink>
-
-
-
         </nav>
-
-
 
       </aside>
 
-
-
-
-
       {/* CONTENT */}
-
-
 
       <main className="app-content">
 
-
-
         <Outlet />
-
-
 
       </main>
 
-
-
     </div>
-
-
 
   );
 
-
-
 }
 
-
-
-
-
 export default AppLayout;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
