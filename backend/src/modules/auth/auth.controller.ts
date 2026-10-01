@@ -81,7 +81,9 @@ export async function getMe(
       req.authUser?.userId;
 
 
-    if (!userId) {
+    if (
+      !userId
+    ) {
 
       return res
         .status(401)
@@ -135,6 +137,12 @@ export async function getMe(
           lastLoginAt:
             true,
 
+          passwordChangedAt:
+            true,
+
+          passwordChangedBy:
+            true,
+
           createdAt:
             true,
 
@@ -160,7 +168,9 @@ export async function getMe(
       });
 
 
-    if (!user) {
+    if (
+      !user
+    ) {
 
       return res
         .status(404)

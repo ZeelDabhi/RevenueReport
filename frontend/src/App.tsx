@@ -7,9 +7,6 @@
 import AppLayout
   from "./components/AppLayout";
 
-import ChangePasswordPage
-  from "./pages/ChangePasswordPage.tsx";
-
 import DailyUploadPage
   from "./pages/DailyUploadPage";
 
@@ -151,14 +148,6 @@ function App() {
           path="/users"
           element={
             <UserManagementPage />
-          }
-        />
-
-
-        <Route
-          path="/change-password"
-          element={
-            <ChangePasswordPage />
           }
         />
 

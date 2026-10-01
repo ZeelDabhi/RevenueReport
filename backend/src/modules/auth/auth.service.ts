@@ -58,7 +58,7 @@ function getJwtSecret(): string {
 
 
 // ======================================================
-// CREATE TOKEN
+// CREATE AUTH TOKEN
 // ======================================================
 
 export function createAuthToken(
@@ -104,7 +104,7 @@ export function createAuthToken(
 
 
 // ======================================================
-// VERIFY TOKEN
+// VERIFY AUTH TOKEN
 // ======================================================
 
 export function verifyAuthToken(
@@ -130,19 +130,11 @@ export function verifyAuthToken(
   }
 
 
-  // ==================================================
-  // USER ID
-  // ==================================================
-
   const userId =
     Number(
       decoded.userId
     );
 
-
-  // ==================================================
-  // USERNAME
-  // ==================================================
 
   const username =
     String(
@@ -150,10 +142,6 @@ export function verifyAuthToken(
       ""
     ).trim();
 
-
-  // ==================================================
-  // ROLE
-  // ==================================================
 
   const role =
     String(
@@ -164,10 +152,6 @@ export function verifyAuthToken(
       .toUpperCase() as AppUserRole;
 
 
-  // ==================================================
-  // UNIT ID
-  // ==================================================
-
   const unitId =
     decoded.unitId === null ||
     decoded.unitId === undefined
@@ -176,10 +160,6 @@ export function verifyAuthToken(
           decoded.unitId
         );
 
-
-  // ==================================================
-  // VALIDATE TOKEN PAYLOAD
-  // ==================================================
 
   if (
     !Number.isInteger(
@@ -236,10 +216,6 @@ export function verifyAuthToken(
   }
 
 
-  // ==================================================
-  // INCHARGE DIRECTOR MUST HAVE UNIT
-  // ==================================================
-
   if (
     role ===
       "INCHARGE_DIRECTOR" &&
@@ -270,6 +246,27 @@ export function verifyAuthToken(
 
 
 // ======================================================
+// NORMALIZE USERNAME
+// ======================================================
+
+function normalizeUsername(
+  usernameInput: unknown
+): string {
+
+  return String(
+    usernameInput ??
+    ""
+  )
+    .trim()
+    .replace(
+      /\s+/g,
+      " "
+    );
+
+}
+
+
+// ======================================================
 // LOGIN
 // ======================================================
 
@@ -278,28 +275,11 @@ export async function loginUser(
   passwordInput: unknown
 ) {
 
-  // ==================================================
-  // USERNAME
-  //
-  // Usernames may contain spaces and capital letters.
-  // Login matching is case-insensitive.
-  // ==================================================
-
   const username =
-    String(
-      usernameInput ??
-      ""
-    )
-      .trim()
-      .replace(
-        /\s+/g,
-        " "
-      );
+    normalizeUsername(
+      usernameInput
+    );
 
-
-  // ==================================================
-  // PASSWORD
-  // ==================================================
 
   const password =
     String(
@@ -329,14 +309,6 @@ export async function loginUser(
 
   }
 
-
-  // ==================================================
-  // FIND USER
-  //
-  // findFirst + mode insensitive allows usernames such as:
-  // "Zeel Dabhi"
-  // "Punit Joshi"
-  // ==================================================
 
   const user =
     await prisma.user.findFirst({
@@ -409,10 +381,6 @@ export async function loginUser(
     });
 
 
-  // ==================================================
-  // USER NOT FOUND
-  // ==================================================
-
   if (
     !user
   ) {
@@ -424,10 +392,6 @@ export async function loginUser(
   }
 
 
-  // ==================================================
-  // ACTIVE CHECK
-  // ==================================================
-
   if (
     !user.isActive
   ) {
@@ -438,10 +402,6 @@ export async function loginUser(
 
   }
 
-
-  // ==================================================
-  // ROLE CHECK
-  // ==================================================
 
   const userRole =
     user.role as AppUserRole;
@@ -460,10 +420,6 @@ export async function loginUser(
   }
 
 
-  // ==================================================
-  // INCHARGE DIRECTOR UNIT CHECK
-  // ==================================================
-
   if (
     userRole ===
       "INCHARGE_DIRECTOR" &&
@@ -476,10 +432,6 @@ export async function loginUser(
 
   }
 
-
-  // ==================================================
-  // PASSWORD CHECK
-  // ==================================================
 
   const passwordMatch =
     await bcrypt.compare(
@@ -499,10 +451,6 @@ export async function loginUser(
   }
 
 
-  // ==================================================
-  // AUTH USER
-  // ==================================================
-
   const authUser: AuthUser = {
 
     userId:
@@ -520,19 +468,11 @@ export async function loginUser(
   };
 
 
-  // ==================================================
-  // CREATE JWT
-  // ==================================================
-
   const token =
     createAuthToken(
       authUser
     );
 
-
-  // ==================================================
-  // LAST LOGIN
-  // ==================================================
 
   const loginTime =
     new Date();
@@ -556,10 +496,6 @@ export async function loginUser(
 
   });
 
-
-  // ==================================================
-  // RESPONSE
-  // ==================================================
 
   return {
 
