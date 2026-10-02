@@ -50,13 +50,10 @@ model Unit {
   name     String  @db.VarChar(150)
   isActive Boolean @default(true)
 
-  imports RevenueImport[]
-
-  targets RevenueTarget[]
-
+  imports     RevenueImport[]
+  targets     RevenueTarget[]
   occupancies DailyOccupancy[]
-
-  users User[]
+  users       User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,15 +90,22 @@ model User {
 
   passwordChangedBy PasswordChangedBy?
 
+  passwordChangedByUserId Int?
+
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
 
   unit Unit? @relation(fields: [unitId], references: [id], onDelete: SetNull)
 
+  passwordChangedByUser User? @relation("PasswordChangedByUser", fields: [passwordChangedByUserId], references: [id], onDelete: SetNull)
+
+  passwordChangesMade User[] @relation("PasswordChangedByUser")
+
   @@index([role])
   @@index([unitId])
   @@index([isActive])
+  @@index([passwordChangedByUserId])
   @@map("users")
 }
 

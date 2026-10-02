@@ -12,7 +12,6 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  Copy,
   Eye,
   EyeOff,
   KeyRound,
@@ -101,12 +100,21 @@ type PasswordChangedBy =
   | "ADMIN";
 
 
+type PasswordChangedByUser = {
+  id: number;
+  name: string;
+  username: string;
+  role: UserRole;
+} | null;
+
+
 type PasswordStatusData = {
   id: number;
   name: string;
   username: string;
   passwordChangedAt: string | null;
   passwordChangedBy: PasswordChangedBy | null;
+  passwordChangedByUser: PasswordChangedByUser;
 };
 
 
@@ -119,9 +127,7 @@ type PasswordStatusResponse = {
 type ResetPasswordResponse = {
   success: boolean;
   message: string;
-  data: PasswordStatusData & {
-    temporaryPassword: string;
-  };
+  data: PasswordStatusData;
 };
 
 
@@ -244,10 +250,6 @@ const FULL_MANAGEMENT_ROLES: UserRole[] = [
 
 const ACTION_MENU_WIDTH =
   185;
-
-
-const ACTION_MENU_HEIGHT =
-  166;
 
 
 const SUPER_ADMIN_ACTION_MENU_HEIGHT =
@@ -1054,10 +1056,31 @@ function UserManagementPage() {
 
 
   const [
-    temporaryPassword,
-    setTemporaryPassword,
+    newPassword,
+    setNewPassword,
   ] =
     useState("");
+
+
+  const [
+    confirmPassword,
+    setConfirmPassword,
+  ] =
+    useState("");
+
+
+  const [
+    showNewPassword,
+    setShowNewPassword,
+  ] =
+    useState(false);
+
+
+  const [
+    showConfirmPassword,
+    setShowConfirmPassword,
+  ] =
+    useState(false);
 
 
   const [
@@ -1075,22 +1098,15 @@ function UserManagementPage() {
 
 
   const [
-    showTemporaryPassword,
-    setShowTemporaryPassword,
-  ] =
-    useState(false);
-
-
-  const [
-    passwordCopied,
-    setPasswordCopied,
-  ] =
-    useState(false);
-
-
-  const [
     passwordModalError,
     setPasswordModalError,
+  ] =
+    useState("");
+
+
+  const [
+    passwordModalSuccess,
+    setPasswordModalSuccess,
   ] =
     useState("");
 
@@ -1491,12 +1507,9 @@ function UserManagementPage() {
 
 
       const actualMenuHeight =
-        currentRole ===
-          "SUPER_ADMIN"
+        hasFullManagement
           ? SUPER_ADMIN_ACTION_MENU_HEIGHT
-          : hasFullManagement
-            ? ACTION_MENU_HEIGHT
-            : 48;
+          : 48;
 
 
       if (
@@ -2450,7 +2463,7 @@ function UserManagementPage() {
 
 
   // ======================================================
-  // PASSWORD RESET - SUPER ADMIN ONLY
+  // PASSWORD RESET - FULL MANAGEMENT
   // ======================================================
 
   const openPasswordResetModal =
@@ -2459,8 +2472,7 @@ function UserManagementPage() {
     ) => {
 
       if (
-        currentRole !==
-        "SUPER_ADMIN"
+        !hasFullManagement
       ) {
 
         return;
@@ -2481,19 +2493,27 @@ function UserManagementPage() {
         null
       );
 
-      setTemporaryPassword(
+      setNewPassword(
         ""
       );
 
-      setShowTemporaryPassword(
+      setConfirmPassword(
+        ""
+      );
+
+      setShowNewPassword(
         false
       );
 
-      setPasswordCopied(
+      setShowConfirmPassword(
         false
       );
 
       setPasswordModalError(
+        ""
+      );
+
+      setPasswordModalSuccess(
         ""
       );
 
@@ -2558,19 +2578,27 @@ function UserManagementPage() {
         null
       );
 
-      setTemporaryPassword(
+      setNewPassword(
         ""
       );
 
-      setShowTemporaryPassword(
+      setConfirmPassword(
+        ""
+      );
+
+      setShowNewPassword(
         false
       );
 
-      setPasswordCopied(
+      setShowConfirmPassword(
         false
       );
 
       setPasswordModalError(
+        ""
+      );
+
+      setPasswordModalSuccess(
         ""
       );
 
@@ -2582,8 +2610,7 @@ function UserManagementPage() {
 
       if (
         !passwordUser ||
-        currentRole !==
-          "SUPER_ADMIN"
+        !hasFullManagement
       ) {
 
         return;
@@ -2595,9 +2622,51 @@ function UserManagementPage() {
         ""
       );
 
-      setPasswordCopied(
-        false
+      setPasswordModalSuccess(
+        ""
       );
+
+
+      if (
+        newPassword.length <
+        6
+      ) {
+
+        setPasswordModalError(
+          "New password must be at least 6 characters."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        newPassword.length >
+        128
+      ) {
+
+        setPasswordModalError(
+          "New password must not exceed 128 characters."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        newPassword !==
+        confirmPassword
+      ) {
+
+        setPasswordModalError(
+          "New password and confirm password do not match."
+        );
+
+        return;
+
+      }
 
 
       try {
@@ -2609,34 +2678,37 @@ function UserManagementPage() {
 
         const response =
           await api.post<ResetPasswordResponse>(
-            `/users/${passwordUser.id}/reset-password`
+            `/users/${passwordUser.id}/reset-password`,
+            {
+              newPassword,
+              confirmPassword,
+            }
           );
 
 
-        setTemporaryPassword(
-          response.data.data.temporaryPassword
+        setPasswordStatus(
+          response.data.data
         );
 
-        setShowTemporaryPassword(
-          true
+        setNewPassword(
+          ""
         );
 
-        setPasswordStatus({
-          id:
-            response.data.data.id,
+        setConfirmPassword(
+          ""
+        );
 
-          name:
-            response.data.data.name,
+        setShowNewPassword(
+          false
+        );
 
-          username:
-            response.data.data.username,
+        setShowConfirmPassword(
+          false
+        );
 
-          passwordChangedAt:
-            response.data.data.passwordChangedAt,
-
-          passwordChangedBy:
-            response.data.data.passwordChangedBy,
-        });
+        setPasswordModalSuccess(
+          "Password reset successfully. The user can now log in with the new password."
+        );
 
       }
       catch (
@@ -2655,41 +2727,6 @@ function UserManagementPage() {
 
         setPasswordSaving(
           false
-        );
-
-      }
-
-    };
-
-
-  const copyTemporaryPassword =
-    async () => {
-
-      if (
-        !temporaryPassword
-      ) {
-
-        return;
-
-      }
-
-
-      try {
-
-        await navigator.clipboard.writeText(
-          temporaryPassword
-        );
-
-
-        setPasswordCopied(
-          true
-        );
-
-      }
-      catch {
-
-        setPasswordModalError(
-          "Unable to copy password. Please select and copy it manually."
         );
 
       }
@@ -3468,8 +3505,7 @@ function UserManagementPage() {
 
 
                                                     {
-                                                      currentRole ===
-                                                        "SUPER_ADMIN" && (
+                                                      hasFullManagement && (
 
                                                         <button
                                                           type="button"
@@ -4941,13 +4977,12 @@ function UserManagementPage() {
 
 
       {/* ==================================================
-          PASSWORD RESET - SUPER ADMIN ONLY
+          PASSWORD RESET - FULL MANAGEMENT
           ================================================== */}
 
       {
         passwordUser &&
-        currentRole ===
-          "SUPER_ADMIN" && (
+        hasFullManagement && (
 
           <div
             className="users-modal-backdrop"
@@ -5030,6 +5065,23 @@ function UserManagementPage() {
 
 
                 {
+                  passwordModalSuccess && (
+
+                    <div className="users-message success">
+
+                      <CheckCircle2
+                        size={18}
+                      />
+
+                      {passwordModalSuccess}
+
+                    </div>
+
+                  )
+                }
+
+
+                {
                   passwordStatusLoading
                     ? (
 
@@ -5049,23 +5101,168 @@ function UserManagementPage() {
 
                       <>
 
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "1fr 1fr",
+                            gap: 12,
+                            marginBottom: 4,
+                          }}
+                        >
+
+                          <div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                fontWeight: 600,
+                                marginBottom: 6,
+                              }}
+                            >
+                              Last Password Change
+                            </div>
+
+                            <div
+                              style={{
+                                padding: "10px 12px",
+                                border: "1px solid #dbe6ee",
+                                borderRadius: 10,
+                                background: "#f8fafc",
+                                fontSize: 13,
+                                fontWeight: 600,
+                              }}
+                            >
+                              {
+                                passwordStatus?.passwordChangedAt
+                                  ? formatDateTime(
+                                      passwordStatus.passwordChangedAt
+                                    )
+                                  : "Never"
+                              }
+                            </div>
+
+                          </div>
+
+
+                          <div>
+
+                            <div
+                              style={{
+                                fontSize: 12,
+                                fontWeight: 600,
+                                marginBottom: 6,
+                              }}
+                            >
+                              Changed By
+                            </div>
+
+                            <div
+                              style={{
+                                padding: "10px 12px",
+                                border: "1px solid #dbe6ee",
+                                borderRadius: 10,
+                                background: "#f8fafc",
+                                fontSize: 13,
+                                fontWeight: 700,
+                              }}
+                            >
+                              {
+                                passwordStatus?.passwordChangedByUser
+                                  ? `${passwordStatus.passwordChangedByUser.name} · ${getRoleLabel(
+                                      passwordStatus.passwordChangedByUser.role
+                                    )}`
+                                  : passwordStatus?.passwordChangedBy ??
+                                    "Not Available"
+                              }
+                            </div>
+
+                          </div>
+
+                        </div>
+
+
                         <label>
 
                           <span>
-                            Last Password Change
+                            New Password
                           </span>
 
-                          <input
-                            type="text"
-                            readOnly
-                            value={
-                              passwordStatus?.passwordChangedAt
-                                ? formatDateTime(
-                                    passwordStatus.passwordChangedAt
+
+                          <div className="users-password-field">
+
+                            <input
+                              type={
+                                showNewPassword
+                                  ? "text"
+                                  : "password"
+                              }
+                              value={
+                                newPassword
+                              }
+                              placeholder="Minimum 6 characters"
+                              autoComplete="new-password"
+                              disabled={
+                                passwordSaving
+                              }
+                              onChange={
+                                (
+                                  event
+                                ) => {
+
+                                  setNewPassword(
+                                    event.target.value
+                                  );
+
+                                  setPasswordModalError(
+                                    ""
+                                  );
+
+                                  setPasswordModalSuccess(
+                                    ""
+                                  );
+
+                                }
+                              }
+                            />
+
+
+                            <button
+                              type="button"
+                              disabled={
+                                passwordSaving
+                              }
+                              onClick={
+                                () =>
+                                  setShowNewPassword(
+                                    (
+                                      current
+                                    ) =>
+                                      !current
                                   )
-                                : "Never"
-                            }
-                          />
+                              }
+                            >
+
+                              {
+                                showNewPassword
+                                  ? (
+
+                                    <EyeOff
+                                      size={18}
+                                    />
+
+                                  )
+                                  : (
+
+                                    <Eye
+                                      size={18}
+                                    />
+
+                                  )
+                              }
+
+                            </button>
+
+                          </div>
 
                         </label>
 
@@ -5073,98 +5270,96 @@ function UserManagementPage() {
                         <label>
 
                           <span>
-                            Changed By
+                            Confirm Password
                           </span>
 
-                          <input
-                            type="text"
-                            readOnly
-                            value={
-                              passwordStatus?.passwordChangedBy ??
-                              "Not Available"
-                            }
-                          />
+
+                          <div className="users-password-field">
+
+                            <input
+                              type={
+                                showConfirmPassword
+                                  ? "text"
+                                  : "password"
+                              }
+                              value={
+                                confirmPassword
+                              }
+                              placeholder="Enter password again"
+                              autoComplete="new-password"
+                              disabled={
+                                passwordSaving
+                              }
+                              onChange={
+                                (
+                                  event
+                                ) => {
+
+                                  setConfirmPassword(
+                                    event.target.value
+                                  );
+
+                                  setPasswordModalError(
+                                    ""
+                                  );
+
+                                  setPasswordModalSuccess(
+                                    ""
+                                  );
+
+                                }
+                              }
+                            />
+
+
+                            <button
+                              type="button"
+                              disabled={
+                                passwordSaving
+                              }
+                              onClick={
+                                () =>
+                                  setShowConfirmPassword(
+                                    (
+                                      current
+                                    ) =>
+                                      !current
+                                  )
+                              }
+                            >
+
+                              {
+                                showConfirmPassword
+                                  ? (
+
+                                    <EyeOff
+                                      size={18}
+                                    />
+
+                                  )
+                                  : (
+
+                                    <Eye
+                                      size={18}
+                                    />
+
+                                  )
+                              }
+
+                            </button>
+
+                          </div>
 
                         </label>
+
+
+                        <small className="users-field-helper">
+                          Minimum 6 characters. Numbers, letters and symbols are allowed.
+                        </small>
 
                       </>
 
                     )
-                }
-
-
-                {
-                  temporaryPassword && (
-
-                    <label>
-
-                      <span>
-                        Temporary Password
-                      </span>
-
-
-                      <div className="users-password-field">
-
-                        <input
-                          type={
-                            showTemporaryPassword
-                              ? "text"
-                              : "password"
-                          }
-                          readOnly
-                          value={
-                            temporaryPassword
-                          }
-                          autoComplete="off"
-                        />
-
-
-                        <button
-                          type="button"
-                          onClick={
-                            () =>
-                              setShowTemporaryPassword(
-                                (
-                                  current
-                                ) =>
-                                  !current
-                              )
-                          }
-                        >
-
-                          {
-                            showTemporaryPassword
-                              ? (
-
-                                <EyeOff
-                                  size={18}
-                                />
-
-                              )
-                              : (
-
-                                <Eye
-                                  size={18}
-                                />
-
-                              )
-                          }
-
-                        </button>
-
-                      </div>
-
-
-                      <small className="users-field-helper">
-
-                        This password is shown only in this reset response.
-                        Copy it before closing this window.
-
-                      </small>
-
-                    </label>
-
-                  )
                 }
 
 
@@ -5186,40 +5381,14 @@ function UserManagementPage() {
                   </button>
 
 
-                  {
-                    temporaryPassword && (
-
-                      <button
-                        type="button"
-                        className="users-cancel-button"
-                        onClick={
-                          () =>
-                            void copyTemporaryPassword()
-                        }
-                      >
-
-                        <Copy
-                          size={16}
-                        />
-
-                        {
-                          passwordCopied
-                            ? "Copied"
-                            : "Copy Password"
-                        }
-
-                      </button>
-
-                    )
-                  }
-
-
                   <button
                     type="button"
                     className="users-create-button"
                     disabled={
                       passwordSaving ||
-                      passwordStatusLoading
+                      passwordStatusLoading ||
+                      newPassword.length < 6 ||
+                      confirmPassword.length < 6
                     }
                     onClick={
                       () =>
@@ -5251,11 +5420,7 @@ function UserManagementPage() {
                               size={17}
                             />
 
-                            {
-                              temporaryPassword
-                                ? "Reset Again"
-                                : "Generate Temporary Password"
-                            }
+                            Reset Password
 
                           </>
 
