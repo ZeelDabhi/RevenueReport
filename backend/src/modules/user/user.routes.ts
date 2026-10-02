@@ -35,9 +35,6 @@ router.use(
 
 // ======================================================
 // CHANGE OWN PASSWORD
-//
-// Any authenticated user can change own password.
-// Current password is required.
 // ======================================================
 
 router.patch(
@@ -48,18 +45,6 @@ router.patch(
 
 // ======================================================
 // LIST USERS
-//
-// FULL MANAGEMENT:
-// SUPER_ADMIN
-// MASTER_ADMIN
-// ADMIN
-// DIRECTOR
-//
-// INCHARGE_DIRECTOR:
-// Allowed to open Users page,
-// but controller returns ONLY:
-// - same unit
-// - INCHARGE_DIRECTOR role
 // ======================================================
 
 router.get(
@@ -77,8 +62,6 @@ router.get(
 
 // ======================================================
 // CREATE USER
-//
-// INCHARGE_DIRECTOR NOT ALLOWED
 // ======================================================
 
 router.post(
@@ -94,38 +77,50 @@ router.post(
 
 
 // ======================================================
-// SUPER ADMIN PASSWORD STATUS
+// PASSWORD STATUS
 //
-// Does not return passwordHash.
-// Returns only change metadata.
+// Allowed:
+// SUPER_ADMIN
+// MASTER_ADMIN
+// ADMIN
+// DIRECTOR
+//
+// Does NOT return passwordHash.
 // ======================================================
 
 router.get(
   "/:id/password-status",
   requireRoles(
-    "SUPER_ADMIN"
+    "SUPER_ADMIN",
+    "MASTER_ADMIN",
+    "ADMIN",
+    "DIRECTOR"
   ),
   getUserPasswordStatus
 );
 
 
 // ======================================================
-// SUPER ADMIN RESET PASSWORD
+// RESET USER PASSWORD
 //
-// Body:
-// {
-//   "password": "optional-password"
-// }
+// Allowed:
+// SUPER_ADMIN
+// MASTER_ADMIN
+// ADMIN
+// DIRECTOR
 //
-// If password is omitted, backend generates one.
-// Temporary password is returned only in this response.
-// Database stores only bcrypt hash.
+// Backend generates temporary password.
+// Plain password is returned only once.
+// Database stores bcrypt hash only.
 // ======================================================
 
 router.post(
   "/:id/reset-password",
   requireRoles(
-    "SUPER_ADMIN"
+    "SUPER_ADMIN",
+    "MASTER_ADMIN",
+    "ADMIN",
+    "DIRECTOR"
   ),
   resetUserPassword
 );
@@ -133,20 +128,6 @@ router.post(
 
 // ======================================================
 // EDIT USER DETAILS
-//
-// FULL MANAGEMENT:
-// Can edit allowed full fields.
-//
-// Password rule:
-// Only SUPER_ADMIN can change password through this route.
-//
-// INCHARGE_DIRECTOR:
-// Can edit same-unit Incharge Directors,
-// but controller blocks:
-// - Password
-// - Role
-// - Unit
-// - Status
 // ======================================================
 
 router.patch(
@@ -164,8 +145,6 @@ router.patch(
 
 // ======================================================
 // ACTIVE / INACTIVE
-//
-// INCHARGE_DIRECTOR NOT ALLOWED
 // ======================================================
 
 router.patch(
@@ -182,8 +161,6 @@ router.patch(
 
 // ======================================================
 // CHANGE ROLE
-//
-// INCHARGE_DIRECTOR NOT ALLOWED
 // ======================================================
 
 router.patch(
@@ -200,8 +177,6 @@ router.patch(
 
 // ======================================================
 // DELETE USER
-//
-// INCHARGE_DIRECTOR NOT ALLOWED
 // ======================================================
 
 router.delete(

@@ -1,32 +1,50 @@
 import bcrypt from "bcryptjs";
 
-import {
-  randomBytes,
-} from "node:crypto";
-
 
 
 import type {
 
+
+
   Response,
+
+
 
 } from "express";
 
 
 
+
+
+
+
 import {
 
+
+
   prisma,
+
+
 
 } from "../../config/database.ts";
 
 
 
+
+
+
+
 import type {
+
+
 
   AppUserRole,
 
+
+
   AuthenticatedRequest,
+
+
 
 } from "../auth/auth.types.ts";
 
@@ -34,25 +52,55 @@ import type {
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // ROLES
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 const FULL_MANAGEMENT_ROLES: AppUserRole[] = [
 
+
+
   "SUPER_ADMIN",
+
+
 
   "MASTER_ADMIN",
 
+
+
   "ADMIN",
+
+
 
   "DIRECTOR",
 
+
+
 ];
+
+
+
+
+
+
 
 
 
@@ -60,15 +108,27 @@ const FULL_MANAGEMENT_ROLES: AppUserRole[] = [
 
 const CREATABLE_ROLES: AppUserRole[] = [
 
+
+
   "SUPER_ADMIN",
+
+
 
   "MASTER_ADMIN",
 
+
+
   "ADMIN",
+
+
 
   "DIRECTOR",
 
+
+
   "INCHARGE_DIRECTOR",
+
+
 
 ];
 
@@ -76,11 +136,25 @@ const CREATABLE_ROLES: AppUserRole[] = [
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // COMMON USER SELECT
 
+
+
 // ======================================================
+
+
+
+
 
 
 
@@ -88,7 +162,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   id: true,
+
+
+
+
 
 
 
@@ -96,7 +178,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   username: true,
+
+
+
+
 
 
 
@@ -104,7 +194,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   mobile: true,
+
+
+
+
 
 
 
@@ -112,7 +210,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   unitId: true,
+
+
+
+
 
 
 
@@ -120,7 +226,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   lastLoginAt: true,
+
+
+
+
 
 
 
@@ -128,7 +242,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   updatedAt: true,
+
+
+
+
 
 
 
@@ -136,7 +258,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
     select: {
+
+
+
+
 
 
 
@@ -144,7 +274,15 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
       name: true,
+
+
+
+
 
 
 
@@ -152,20 +290,39 @@ const PUBLIC_USER_SELECT = {
 
 
 
+
+
+
+
   },
 
 
 
+
+
+
+
 } as const;
+
+
+
 
 
 const SUPER_ADMIN_USER_SELECT = {
 
+
+
   ...PUBLIC_USER_SELECT,
+
+
 
   passwordChangedAt: true,
 
+
+
   passwordChangedBy: true,
+
+
 
 } as const;
 
@@ -173,31 +330,67 @@ const SUPER_ADMIN_USER_SELECT = {
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // ACCESS HELPERS
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 function hasFullUserManagementAccess(
 
+
+
   role: AppUserRole
+
+
 
 ): boolean {
 
 
 
+
+
+
+
   return FULL_MANAGEMENT_ROLES.includes(
 
+
+
     role
+
+
 
   );
 
 
 
+
+
+
+
 }
+
+
+
+
+
+
 
 
 
@@ -205,13 +398,23 @@ function hasFullUserManagementAccess(
 
 function ensureAuthenticated(
 
+
+
   req: AuthenticatedRequest
+
+
 
 ) {
 
 
 
+
+
+
+
   const actor =
+
+
 
     req.authUser;
 
@@ -219,19 +422,41 @@ function ensureAuthenticated(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     !actor
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
+
+
 
       "Authentication required"
 
+
+
     );
+
+
+
+
 
 
 
@@ -241,11 +466,27 @@ function ensureAuthenticated(
 
 
 
+
+
+
+
+
+
   return actor;
 
 
 
+
+
+
+
 }
+
+
+
+
+
+
 
 
 
@@ -253,19 +494,39 @@ function ensureAuthenticated(
 
 function ensureFullManagementAccess(
 
+
+
   req: AuthenticatedRequest
+
+
 
 ) {
 
 
 
+
+
+
+
   const actor =
+
+
 
     ensureAuthenticated(
 
+
+
       req
 
+
+
     );
+
+
+
+
+
+
 
 
 
@@ -273,25 +534,51 @@ function ensureFullManagementAccess(
 
   if (
 
+
+
     !hasFullUserManagementAccess(
+
+
 
       actor.role
 
+
+
     )
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       "You do not have permission to manage users"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
+
+
 
 
 
@@ -301,35 +588,73 @@ function ensureFullManagementAccess(
 
 
 
+
+
+
+
 }
 
 
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // USER ID
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 function getUserId(
 
+
+
   value: unknown
+
+
 
 ): number {
 
 
 
+
+
+
+
   const userId =
+
+
 
     Number(
 
+
+
       value
 
+
+
     );
+
+
+
+
+
+
 
 
 
@@ -337,27 +662,55 @@ function getUserId(
 
   if (
 
+
+
     !Number.isInteger(
+
+
 
       userId
 
+
+
     ) ||
 
+
+
     userId <= 0
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       "Valid user ID is required"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
+
+
 
 
 
@@ -367,35 +720,71 @@ function getUserId(
 
 
 
+
+
+
+
 }
 
 
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // EMAIL
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 function isValidEmail(
 
+
+
   email: string
+
+
 
 ): boolean {
 
 
 
+
+
+
+
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+
 
     .test(
 
+
+
       email
 
+
+
     );
+
+
+
+
 
 
 
@@ -405,39 +794,83 @@ function isValidEmail(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // MOBILE
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 function normalizeMobile(
 
+
+
   value: unknown
+
+
 
 ): string {
 
 
 
+
+
+
+
   let digits =
+
+
 
     String(
 
+
+
       value ??
+
+
 
       ""
 
+
+
     )
+
+
 
       .replace(
 
+
+
         /\D/g,
+
+
 
         ""
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -445,29 +878,59 @@ function normalizeMobile(
 
   if (
 
+
+
     digits.length === 12 &&
+
+
 
     digits.startsWith(
 
+
+
       "91"
 
+
+
     )
+
+
 
   ) {
 
 
 
+
+
+
+
     digits =
+
+
 
       digits.slice(
 
+
+
         2
+
+
 
       );
 
 
 
+
+
+
+
   }
+
+
+
+
+
+
 
 
 
@@ -477,7 +940,17 @@ function normalizeMobile(
 
 
 
+
+
+
+
 }
+
+
+
+
+
+
 
 
 
@@ -485,19 +958,37 @@ function normalizeMobile(
 
 function isValidMobile(
 
+
+
   mobile: string
+
+
 
 ): boolean {
 
 
 
+
+
+
+
   return /^[0-9]{10}$/
+
+
 
     .test(
 
+
+
       mobile
 
+
+
     );
+
+
+
+
 
 
 
@@ -507,79 +998,163 @@ function isValidMobile(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // ROLE
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 function normalizeRole(
 
+
+
   value: unknown
+
+
 
 ): AppUserRole {
 
 
 
+
+
+
+
   return String(
+
+
 
     value ??
 
+
+
     ""
+
+
 
   )
 
+
+
     .trim()
+
+
 
     .toUpperCase() as AppUserRole;
 
 
 
+
+
+
+
 }
 
 
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // USERNAME
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 function normalizeUsername(
 
+
+
   value: unknown
+
+
 
 ): string {
 
 
 
+
+
+
+
   return String(
+
+
 
     value ??
 
+
+
     ""
+
+
 
   )
 
+
+
     .trim()
+
+
 
     .replace(
 
+
+
       /\s+/g,
 
+
+
       " "
+
+
 
     );
 
 
 
+
+
+
+
 }
+
+
+
+
+
+
 
 
 
@@ -587,29 +1162,59 @@ function normalizeUsername(
 
 function validateUsername(
 
+
+
   username: string
+
+
 
 ) {
 
 
 
+
+
+
+
   if (
+
+
 
     !username
 
+
+
   ) {
+
+
+
+
 
 
 
     throw new Error(
 
+
+
       "Username is required"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
+
+
 
 
 
@@ -617,27 +1222,55 @@ function validateUsername(
 
   if (
 
+
+
     username.length >
 
+
+
     100
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       "Username is too long"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
 }
+
+
+
+
+
+
 
 
 
@@ -645,17 +1278,33 @@ function validateUsername(
 
 async function ensureUsernameAvailable(
 
+
+
   username: string,
 
+
+
   excludeUserId?: number
+
+
 
 ) {
 
 
 
+
+
+
+
   const existing =
 
+
+
     await prisma.user.findFirst({
+
+
+
+
 
 
 
@@ -663,19 +1312,39 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
         username: {
+
+
+
+
 
 
 
           equals:
 
+
+
             username,
+
+
+
+
 
 
 
           mode:
 
+
+
             "insensitive",
+
+
+
+
 
 
 
@@ -683,9 +1352,19 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
         ...(excludeUserId
 
+
+
           ? {
+
+
+
+
 
 
 
@@ -693,9 +1372,19 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
                 not:
 
+
+
                   excludeUserId,
+
+
+
+
 
 
 
@@ -703,13 +1392,27 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
             }
+
+
 
           : {}),
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -717,13 +1420,27 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
         id:
+
+
 
           true,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -733,23 +1450,49 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     existing
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       "Username already exists"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -759,23 +1502,47 @@ async function ensureUsernameAvailable(
 
 
 
+
+
+
+
+
+
 async function generateUniqueUsername(
 
+
+
   email: string
+
+
 
 ): Promise<string> {
 
 
 
+
+
+
+
   const emailPrefix =
+
+
 
     email
 
+
+
       .split("@")[0]
+
+
 
       ?.trim()
 
+
+
       .toLowerCase() ??
+
+
 
     "user";
 
@@ -783,23 +1550,47 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   let baseUsername =
+
+
 
     emailPrefix
 
+
+
       .replace(
 
-        /[^a-z0-9._-]/g,
+
+
+        /[^a-z0-9.\_-]/g,
+
+
 
         ""
+
+
 
       )
 
+
+
       .replace(
 
-        /^[._-]+|[._-]+$/g,
+
+
+        /^[.\_-]+|[.\_-]+$/g,
+
+
 
         ""
+
+
 
       );
 
@@ -807,17 +1598,37 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     !baseUsername
+
+
 
   ) {
 
 
 
+
+
+
+
     baseUsername =
 
+
+
       "user";
+
+
+
+
 
 
 
@@ -827,13 +1638,27 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   baseUsername =
+
+
 
     baseUsername.slice(
 
+
+
       0,
 
+
+
       90
+
+
 
     );
 
@@ -841,9 +1666,21 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   const existingUsers =
 
+
+
     await prisma.user.findMany({
+
+
+
+
 
 
 
@@ -851,13 +1688,27 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
         username: {
+
+
+
+
 
 
 
           startsWith:
 
+
+
             baseUsername,
+
+
+
+
 
 
 
@@ -865,7 +1716,15 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -873,13 +1732,27 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
         username:
+
+
 
           true,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -889,23 +1762,47 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   const existingUsernames =
+
+
 
     new Set(
 
+
+
       existingUsers.map(
+
+
 
         (
 
+
+
           user
+
+
 
         ) =>
 
+
+
           user.username
+
+
 
             .toLowerCase()
 
+
+
       )
+
+
 
     );
 
@@ -913,19 +1810,41 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   if (
+
+
 
     !existingUsernames.has(
 
+
+
       baseUsername
 
+
+
     )
+
+
 
   ) {
 
 
 
+
+
+
+
     return baseUsername;
+
+
+
+
 
 
 
@@ -935,7 +1854,15 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   let suffix =
+
+
 
     2;
 
@@ -943,21 +1870,47 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
   while (
 
+
+
     true
+
+
 
   ) {
 
 
 
+
+
+
+
     const suffixText =
+
+
 
       String(
 
+
+
         suffix
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -965,13 +1918,23 @@ async function generateUniqueUsername(
 
     const candidateBase =
 
+
+
       baseUsername.slice(
+
+
 
         0,
 
+
+
         100 -
 
+
+
           suffixText.length
+
+
 
       );
 
@@ -979,7 +1942,15 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
     const candidate =
+
+
 
       `${candidateBase}${suffixText}`;
 
@@ -987,19 +1958,41 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !existingUsernames.has(
 
+
+
         candidate
 
+
+
       )
+
+
 
     ) {
 
 
 
+
+
+
+
       return candidate;
+
+
+
+
 
 
 
@@ -1009,13 +2002,29 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
     suffix +=
+
+
 
       1;
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -1025,31 +2034,65 @@ async function generateUniqueUsername(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // UNIT
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 async function getUnitIdForRole(
 
+
+
   role: AppUserRole,
 
+
+
   unitCodeValue: unknown
+
+
 
 ): Promise<number | null> {
 
 
 
+
+
+
+
   if (
+
+
 
     role !==
 
+
+
     "INCHARGE_DIRECTOR"
 
+
+
   ) {
+
+
+
+
 
 
 
@@ -1057,7 +2100,17 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
   }
+
+
+
+
+
+
 
 
 
@@ -1065,15 +2118,27 @@ async function getUnitIdForRole(
 
   const unitCode =
 
+
+
     String(
+
+
 
       unitCodeValue ??
 
+
+
       ""
+
+
 
     )
 
+
+
       .trim()
+
+
 
       .toUpperCase();
 
@@ -1081,19 +2146,41 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     !unitCode
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
+
+
 
       "Unit is required for Incharge Director"
 
+
+
     );
+
+
+
+
 
 
 
@@ -1103,9 +2190,21 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
+
+
   const unit =
 
+
+
     await prisma.unit.findFirst({
+
+
+
+
 
 
 
@@ -1113,19 +2212,39 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
         code:
+
+
 
           unitCode,
 
 
 
+
+
+
+
         isActive:
+
+
 
           true,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1133,13 +2252,27 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
         id:
+
+
 
           true,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1149,23 +2282,51 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     !unit
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       `Invalid or inactive unit: ${unitCode}`
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
+
+
 
 
 
@@ -1175,37 +2336,75 @@ async function getUnitIdForRole(
 
 
 
+
+
+
+
 }
 
 
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // DUPLICATE EMAIL
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 async function ensureEmailAvailable(
 
+
+
   email: string,
 
+
+
   excludeUserId?: number
+
+
 
 ) {
 
 
 
+
+
+
+
   const existing =
+
+
 
     await prisma.user.findFirst({
 
 
 
+
+
+
+
       where: {
+
+
+
+
 
 
 
@@ -1213,9 +2412,19 @@ async function ensureEmailAvailable(
 
 
 
+
+
+
+
         ...(excludeUserId
 
+
+
           ? {
+
+
+
+
 
 
 
@@ -1223,9 +2432,19 @@ async function ensureEmailAvailable(
 
 
 
+
+
+
+
                 not:
 
+
+
                   excludeUserId,
+
+
+
+
 
 
 
@@ -1233,13 +2452,27 @@ async function ensureEmailAvailable(
 
 
 
+
+
+
+
             }
+
+
 
           : {}),
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1247,13 +2480,27 @@ async function ensureEmailAvailable(
 
 
 
+
+
+
+
         id:
+
+
 
           true,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1263,23 +2510,49 @@ async function ensureEmailAvailable(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     existing
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       "Email already exists"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -1289,31 +2562,65 @@ async function ensureEmailAvailable(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // DUPLICATE MOBILE
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 async function ensureMobileAvailable(
 
+
+
   mobile: string,
 
+
+
   excludeUserId?: number
+
+
 
 ) {
 
 
 
+
+
+
+
   const existing =
+
+
 
     await prisma.user.findFirst({
 
 
 
+
+
+
+
       where: {
+
+
+
+
 
 
 
@@ -1321,9 +2628,19 @@ async function ensureMobileAvailable(
 
 
 
+
+
+
+
         ...(excludeUserId
 
+
+
           ? {
+
+
+
+
 
 
 
@@ -1331,9 +2648,19 @@ async function ensureMobileAvailable(
 
 
 
+
+
+
+
                 not:
 
+
+
                   excludeUserId,
+
+
+
+
 
 
 
@@ -1341,13 +2668,27 @@ async function ensureMobileAvailable(
 
 
 
+
+
+
+
             }
+
+
 
           : {}),
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1355,13 +2696,27 @@ async function ensureMobileAvailable(
 
 
 
+
+
+
+
         id:
+
+
 
           true,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1371,19 +2726,41 @@ async function ensureMobileAvailable(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     existing
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
+
+
 
       "Mobile number already exists"
 
+
+
     );
+
+
+
+
 
 
 
@@ -1391,49 +2768,63 @@ async function ensureMobileAvailable(
 
 
 
+
+
+
+
 }
 
 
 
 
 
-// ======================================================
-// TEMPORARY PASSWORD
-// ======================================================
 
-function generateTemporaryPassword(): string {
 
-  const randomPart =
-    randomBytes(
-      9
-    ).toString(
-      "base64url"
-    );
 
-  return `Aa1!${randomPart}`;
 
-}
 
 
 // ======================================================
+
+
 
 // LAST ACTIVE SUPER ADMIN
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 async function ensureAnotherActiveSuperAdminExists(
 
+
+
   targetUserId: number
+
+
 
 ) {
 
 
 
+
+
+
+
   const count =
 
+
+
     await prisma.user.count({
+
+
+
+
 
 
 
@@ -1441,15 +2832,31 @@ async function ensureAnotherActiveSuperAdminExists(
 
 
 
+
+
+
+
         role:
+
+
 
           "SUPER_ADMIN",
 
 
 
+
+
+
+
         isActive:
 
+
+
           true,
+
+
+
+
 
 
 
@@ -1457,9 +2864,19 @@ async function ensureAnotherActiveSuperAdminExists(
 
 
 
+
+
+
+
           not:
 
+
+
             targetUserId,
+
+
+
+
 
 
 
@@ -1467,7 +2884,15 @@ async function ensureAnotherActiveSuperAdminExists(
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -1477,23 +2902,49 @@ async function ensureAnotherActiveSuperAdminExists(
 
 
 
+
+
+
+
+
+
   if (
 
+
+
     count === 0
+
+
 
   ) {
 
 
 
+
+
+
+
     throw new Error(
 
+
+
       "At least one active Super Admin must remain"
+
+
 
     );
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -1503,21 +2954,45 @@ async function ensureAnotherActiveSuperAdminExists(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // CREATE USER
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 export async function createUser(
 
+
+
   req: AuthenticatedRequest,
+
+
 
   res: Response
 
+
+
 ) {
+
+
+
+
 
 
 
@@ -1525,11 +3000,23 @@ export async function createUser(
 
 
 
-    ensureFullManagementAccess(
 
-      req
 
-    );
+
+
+    const actor =
+
+      ensureFullManagementAccess(
+
+        req
+
+      );
+
+
+
+
+
+
 
 
 
@@ -1537,11 +3024,19 @@ export async function createUser(
 
     const name =
 
+
+
       String(
+
+
 
         req.body?.name ??
 
+
+
         ""
+
+
 
       ).trim();
 
@@ -1549,13 +3044,31 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     const requestedUsername =
+
+
 
       normalizeUsername(
 
+
+
         req.body?.username
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1563,15 +3076,27 @@ export async function createUser(
 
     const email =
 
+
+
       String(
+
+
 
         req.body?.email ??
 
+
+
         ""
+
+
 
       )
 
+
+
         .trim()
+
+
 
         .toLowerCase();
 
@@ -1579,13 +3104,31 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     const mobile =
+
+
 
       normalizeMobile(
 
+
+
         req.body?.mobile
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1593,13 +3136,27 @@ export async function createUser(
 
     const password =
 
+
+
       String(
+
+
 
         req.body?.password ??
 
+
+
         ""
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1607,11 +3164,23 @@ export async function createUser(
 
     const role =
 
+
+
       normalizeRole(
+
+
 
         req.body?.role
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1619,25 +3188,49 @@ export async function createUser(
 
     const requestedIsActive =
 
+
+
       req.body?.isActive;
 
 
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !name
 
+
+
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Name is required"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1647,21 +3240,45 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       name.length >
 
+
+
       150
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Name is too long"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1671,25 +3288,53 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !email ||
 
+
+
       !isValidEmail(
+
+
 
         email
 
+
+
       )
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Valid email is required"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1699,21 +3344,45 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       email.length >
 
+
+
       150
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Email is too long"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1723,23 +3392,49 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !isValidMobile(
 
+
+
         mobile
 
+
+
       )
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Mobile number must contain exactly 10 digits"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1749,21 +3444,45 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       password.length <
 
+
+
       8
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Password must be at least 8 characters"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1773,23 +3492,49 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !CREATABLE_ROLES.includes(
 
+
+
         role
+
+
 
       )
 
+
+
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "Invalid user role"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1799,25 +3544,53 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       requestedIsActive !==
 
+
+
         undefined &&
+
+
 
       typeof requestedIsActive !==
 
+
+
         "boolean"
 
+
+
     ) {
+
+
+
+
 
 
 
       throw new Error(
 
+
+
         "isActive must be true or false"
 
+
+
       );
+
+
+
+
 
 
 
@@ -1827,23 +3600,51 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       requestedUsername
 
+
+
     ) {
+
+
+
+
 
 
 
       validateUsername(
 
+
+
         requestedUsername
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -1853,39 +3654,79 @@ export async function createUser(
 
 
 
+
+
+
+
       ensureEmailAvailable(
+
+
 
         email
 
+
+
       ),
+
+
+
+
 
 
 
       ensureMobileAvailable(
 
+
+
         mobile
+
+
 
       ),
 
 
 
+
+
+
+
       ...(requestedUsername
+
+
 
         ? [
 
 
 
+
+
+
+
             ensureUsernameAvailable(
 
+
+
               requestedUsername
+
+
 
             ),
 
 
 
+
+
+
+
           ]
 
+
+
         : []),
+
+
+
+
 
 
 
@@ -1895,15 +3736,35 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     const unitId =
+
+
 
       await getUnitIdForRole(
 
+
+
         role,
+
+
 
         req.body?.unitCode
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1911,13 +3772,27 @@ export async function createUser(
 
     const username =
 
+
+
       requestedUsername ||
+
+
 
       await generateUniqueUsername(
 
+
+
         email
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -1925,11 +3800,19 @@ export async function createUser(
 
     const passwordHash =
 
+
+
       await bcrypt.hash(
+
+
 
         password,
 
+
+
         12
+
+
 
       );
 
@@ -1937,9 +3820,21 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     const user =
 
+
+
       await prisma.user.create({
+
+
+
+
 
 
 
@@ -1947,7 +3842,15 @@ export async function createUser(
 
 
 
+
+
+
+
           name,
+
+
+
+
 
 
 
@@ -1955,7 +3858,15 @@ export async function createUser(
 
 
 
+
+
+
+
           email,
+
+
+
+
 
 
 
@@ -1963,21 +3874,49 @@ export async function createUser(
 
 
 
+
+
+
+
           passwordHash,
 
 
+
+
+
           passwordChangedAt:
+
             new Date(),
 
 
+
+
+
           passwordChangedBy:
+
             "ADMIN" as any,
+
+
+
+          passwordChangedByUserId:
+
+            actor.userId,
+
+
+
+
 
 
 
           role:
 
+
+
             role as any,
+
+
+
+
 
 
 
@@ -1985,11 +3924,23 @@ export async function createUser(
 
 
 
+
+
+
+
           isActive:
+
+
 
             requestedIsActive ??
 
+
+
             true,
+
+
+
+
 
 
 
@@ -1997,13 +3948,29 @@ export async function createUser(
 
 
 
+
+
+
+
         select:
+
+
 
           PUBLIC_USER_SELECT,
 
 
 
+
+
+
+
       });
+
+
+
+
+
+
 
 
 
@@ -2011,27 +3978,53 @@ export async function createUser(
 
     return res
 
+
+
       .status(201)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           true,
 
 
 
+
+
+
+
         message:
+
+
 
           "User created successfully",
 
 
 
+
+
+
+
         data:
 
+
+
           user,
+
+
+
+
 
 
 
@@ -2039,21 +4032,41 @@ export async function createUser(
 
 
 
+
+
+
+
   }
+
+
 
   catch (
 
+
+
     error
+
+
 
   ) {
 
 
 
+
+
+
+
     const message =
+
+
 
       error instanceof Error
 
+
+
         ? error.message
+
+
 
         : "Unable to create user";
 
@@ -2061,9 +4074,19 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     const forbidden =
 
+
+
       message ===
+
+
 
       "You do not have permission to manage users";
 
@@ -2071,25 +4094,53 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
     return res
+
+
 
       .status(
 
+
+
         forbidden
+
+
 
           ? 403
 
+
+
           : 400
 
+
+
       )
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
 
+
+
           false,
+
+
+
+
 
 
 
@@ -2097,11 +4148,23 @@ export async function createUser(
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -2111,71 +4174,145 @@ export async function createUser(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // LIST USERS
 
+
+
 //
+
+
 
 // FULL MANAGEMENT:
 
+
+
 // ----------------
+
+
 
 // SUPER ADMIN
 
+
+
 // MASTER ADMIN
+
+
 
 // ADMIN
 
+
+
 // DIRECTOR
 
+
+
 //
+
+
 
 // -> ALL USERS
 
+
+
 //
+
+
 
 // INCHARGE DIRECTOR:
 
+
+
 // ------------------
+
+
 
 // Example logged user:
 
+
+
 // MB - MORBI
 
+
+
 //
+
+
 
 // Return ONLY:
 
+
+
 // role   = INCHARGE_DIRECTOR
+
+
 
 // unitId = MB
 
+
+
 //
+
+
 
 // DOES NOT RETURN:
 
+
+
 // Super Admin
+
+
 
 // Master Admin
 
+
+
 // Admin
+
+
 
 // Director
 
+
+
 // Other unit Incharge Directors
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 export async function listUsers(
 
+
+
   req: AuthenticatedRequest,
+
+
 
   res: Response
 
+
+
 ) {
+
+
+
+
 
 
 
@@ -2183,13 +4320,29 @@ export async function listUsers(
 
 
 
+
+
+
+
     const actor =
+
+
 
       ensureAuthenticated(
 
+
+
         req
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -2197,9 +4350,15 @@ export async function listUsers(
 
     const fullAccess =
 
+
+
       hasFullUserManagementAccess(
 
+
+
         actor.role
+
+
 
       );
 
@@ -2207,39 +4366,81 @@ export async function listUsers(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !fullAccess &&
 
+
+
       actor.role !==
 
+
+
         "INCHARGE_DIRECTOR"
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(403)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
+
+
 
             "You do not have permission to view users",
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -2249,45 +4450,93 @@ export async function listUsers(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       actor.role ===
 
+
+
       "INCHARGE_DIRECTOR"
+
+
 
     ) {
 
 
 
+
+
+
+
       if (
 
+
+
         !actor.unitId
+
+
 
       ) {
 
 
 
+
+
+
+
         return res
 
+
+
           .status(403)
+
+
 
           .json({
 
 
 
+
+
+
+
             success:
+
+
 
               false,
 
 
 
+
+
+
+
             message:
+
+
 
               "No unit is assigned to this Incharge Director",
 
 
 
+
+
+
+
           });
+
+
+
+
 
 
 
@@ -2297,9 +4546,21 @@ export async function listUsers(
 
 
 
+
+
+
+
+
+
       const users =
 
+
+
         await prisma.user.findMany({
+
+
+
+
 
 
 
@@ -2307,15 +4568,31 @@ export async function listUsers(
 
 
 
+
+
+
+
             role:
+
+
 
               "INCHARGE_DIRECTOR",
 
 
 
+
+
+
+
             unitId:
 
+
+
               actor.unitId,
+
+
+
+
 
 
 
@@ -2323,9 +4600,19 @@ export async function listUsers(
 
 
 
+
+
+
+
           select:
 
+
+
             PUBLIC_USER_SELECT,
+
+
+
+
 
 
 
@@ -2333,17 +4620,35 @@ export async function listUsers(
 
 
 
+
+
+
+
             {
+
+
+
+
 
 
 
               isActive:
 
+
+
                 "desc",
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -2351,13 +4656,27 @@ export async function listUsers(
 
 
 
+
+
+
+
               name:
+
+
 
                 "asc",
 
 
 
+
+
+
+
             },
+
+
+
+
 
 
 
@@ -2365,7 +4684,17 @@ export async function listUsers(
 
 
 
+
+
+
+
         });
+
+
+
+
+
+
 
 
 
@@ -2373,31 +4702,61 @@ export async function listUsers(
 
       return res
 
+
+
         .status(200)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             true,
 
 
 
+
+
+
+
           total:
+
+
 
             users.length,
 
 
 
+
+
+
+
           data:
+
+
 
             users,
 
 
 
+
+
+
+
         });
+
+
+
+
 
 
 
@@ -2407,26 +4766,55 @@ export async function listUsers(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // FULL MANAGEMENT USERS
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     const users =
 
+
+
       await prisma.user.findMany({
+
+
+
+
 
 
 
         select:
 
+
+
           actor.role ===
+
             "SUPER_ADMIN"
+
             ? SUPER_ADMIN_USER_SELECT
+
             : PUBLIC_USER_SELECT,
+
+
+
+
 
 
 
@@ -2434,17 +4822,35 @@ export async function listUsers(
 
 
 
+
+
+
+
           {
+
+
+
+
 
 
 
             isActive:
 
+
+
               "desc",
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -2452,13 +4858,27 @@ export async function listUsers(
 
 
 
+
+
+
+
             name:
+
+
 
               "asc",
 
 
 
+
+
+
+
           },
+
+
+
+
 
 
 
@@ -2466,7 +4886,17 @@ export async function listUsers(
 
 
 
+
+
+
+
       });
+
+
+
+
+
+
 
 
 
@@ -2474,65 +4904,129 @@ export async function listUsers(
 
     return res
 
+
+
       .status(200)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           true,
 
 
 
+
+
+
+
         total:
+
+
 
           users.length,
 
 
 
+
+
+
+
         data:
+
+
 
           users,
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
   }
 
+
+
   catch (
 
+
+
     error
+
+
 
   ) {
 
 
 
+
+
+
+
     return res
 
+
+
       .status(500)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           false,
 
 
 
+
+
+
+
         message:
+
+
 
           error instanceof Error
 
+
+
             ? error.message
 
+
+
             : "Unable to load users",
+
+
+
+
 
 
 
@@ -2540,7 +5034,15 @@ export async function listUsers(
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -2550,65 +5052,133 @@ export async function listUsers(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // EDIT DETAILS
 
+
+
 //
+
+
 
 // FULL MANAGEMENT:
 
+
+
 // Can edit any user.
 
+
+
 //
+
+
 
 // INCHARGE DIRECTOR:
 
+
+
 // Can edit ONLY:
 
+
+
 //
+
+
 
 // target.role = INCHARGE_DIRECTOR
 
+
+
 // AND
+
+
 
 // target.unitId = logged-in unitId
 
+
+
 //
+
+
 
 // Allowed fields:
 
+
+
 // Name
+
+
 
 // Username
 
+
+
 // Email
+
+
 
 // Mobile
 
+
+
 // Password
+
+
 
 //
 
+
+
 // NOT ALLOWED:
+
+
 
 // Role
 
+
+
 // Unit
+
+
 
 // Status
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 export async function updateUserDetails(
 
+
+
   req: AuthenticatedRequest,
+
+
 
   res: Response
 
+
+
 ) {
+
+
+
+
 
 
 
@@ -2616,13 +5186,29 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
     const actor =
+
+
 
       ensureAuthenticated(
 
+
+
         req
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -2630,9 +5216,15 @@ export async function updateUserDetails(
 
     const userId =
 
+
+
       getUserId(
 
+
+
         req.params.id
+
+
 
       );
 
@@ -2640,9 +5232,21 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     const existingUser =
 
+
+
       await prisma.user.findUnique({
+
+
+
+
 
 
 
@@ -2650,13 +5254,27 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
           id:
+
+
 
             userId,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -2664,37 +5282,75 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
           id:
 
+
+
             true,
+
+
+
+
 
 
 
           username:
 
+
+
             true,
+
+
+
+
 
 
 
           role:
 
+
+
             true,
+
+
+
+
 
 
 
           unitId:
 
+
+
             true,
+
+
+
+
 
 
 
           isActive:
 
+
+
             true,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -2704,31 +5360,65 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     if (
 
+
+
       !existingUser
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(404)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
 
+
+
             "User not found",
+
+
+
+
 
 
 
@@ -2736,7 +5426,17 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -2744,9 +5444,15 @@ export async function updateUserDetails(
 
     const fullAccess =
 
+
+
       hasFullUserManagementAccess(
 
+
+
         actor.role
+
+
 
       );
 
@@ -2754,39 +5460,79 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // STRICT INCHARGE DIRECTOR ACCESS
 
+
+
     //
+
+
 
     // Must be:
 
+
+
     // - logged user = INCHARGE_DIRECTOR
+
+
 
     // - target = INCHARGE_DIRECTOR
 
+
+
     // - same unit
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     const sameUnitInchargeAccess =
 
+
+
       actor.role ===
 
+
+
         "INCHARGE_DIRECTOR" &&
+
+
 
       actor.unitId !==
 
+
+
         null &&
+
+
 
       existingUser.role ===
 
+
+
         "INCHARGE_DIRECTOR" &&
 
+
+
       existingUser.unitId ===
+
+
 
         actor.unitId;
 
@@ -2794,33 +5540,69 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !fullAccess &&
 
+
+
       !sameUnitInchargeAccess
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(403)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
 
+
+
             "You can only edit Incharge Directors from your assigned unit",
+
+
+
+
 
 
 
@@ -2828,7 +5610,17 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -2836,9 +5628,19 @@ export async function updateUserDetails(
 
     const hasName =
 
+
+
       req.body?.name !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2846,9 +5648,19 @@ export async function updateUserDetails(
 
     const hasUsername =
 
+
+
       req.body?.username !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2856,9 +5668,19 @@ export async function updateUserDetails(
 
     const hasEmail =
 
+
+
       req.body?.email !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2866,9 +5688,19 @@ export async function updateUserDetails(
 
     const hasMobile =
 
+
+
       req.body?.mobile !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2876,9 +5708,19 @@ export async function updateUserDetails(
 
     const hasPassword =
 
+
+
       req.body?.password !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2886,9 +5728,19 @@ export async function updateUserDetails(
 
     const hasRole =
 
+
+
       req.body?.role !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2896,9 +5748,19 @@ export async function updateUserDetails(
 
     const hasUnitCode =
 
+
+
       req.body?.unitCode !==
 
+
+
       undefined;
+
+
+
+
+
+
 
 
 
@@ -2906,7 +5768,11 @@ export async function updateUserDetails(
 
     const hasIsActive =
 
+
+
       req.body?.isActive !==
+
+
 
       undefined;
 
@@ -2914,33 +5780,69 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       !hasName &&
 
+
+
       !hasUsername &&
+
+
 
       !hasEmail &&
 
+
+
       !hasMobile &&
+
+
 
       !hasPassword &&
 
+
+
       !hasRole &&
+
+
 
       !hasUnitCode &&
 
+
+
       !hasIsActive
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "No user details were provided"
 
+
+
       );
+
+
+
+
 
 
 
@@ -2950,49 +5852,101 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // INCHARGE DIRECTOR CANNOT CHANGE SECURITY FIELDS
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     if (
 
+
+
       !fullAccess &&
+
+
 
       (
 
+
+
         hasRole ||
+
+
 
         hasUnitCode ||
 
+
+
         hasIsActive
 
+
+
       )
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(403)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
 
+
+
             "Incharge Director can edit personal details only. Role, unit and status cannot be changed.",
+
+
+
+
 
 
 
@@ -3000,7 +5954,17 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -3010,7 +5974,15 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
       name?: string;
+
+
+
+
 
 
 
@@ -3018,7 +5990,15 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
       email?: string;
+
+
+
+
 
 
 
@@ -3026,15 +6006,35 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
       passwordHash?: string;
+
+
+
 
 
       passwordChangedAt?: Date;
 
 
+
+
+
       passwordChangedBy?:
+
         | "SELF"
+
         | "ADMIN";
+
+
+
+
+
+
+
+      passwordChangedByUserId?: number;
 
 
 
@@ -3042,11 +6042,23 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
       unitId?: number | null;
 
 
 
+
+
+
+
       isActive?: boolean;
+
+
+
+
 
 
 
@@ -3056,29 +6068,59 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // NAME
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     if (
 
+
+
       hasName
+
+
 
     ) {
 
 
 
+
+
+
+
       const name =
+
+
 
         String(
 
+
+
           req.body?.name ??
 
+
+
           ""
+
+
 
         ).trim();
 
@@ -3086,23 +6128,51 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       if (
+
+
 
         !name
 
+
+
       ) {
+
+
+
+
 
 
 
         throw new Error(
 
+
+
           "Name is required"
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3110,23 +6180,47 @@ export async function updateUserDetails(
 
       if (
 
+
+
         name.length >
 
+
+
         150
+
+
 
       ) {
 
 
 
+
+
+
+
         throw new Error(
 
+
+
           "Name is too long"
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3134,7 +6228,13 @@ export async function updateUserDetails(
 
       data.name =
 
+
+
         name;
+
+
+
+
 
 
 
@@ -3144,29 +6244,63 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // USERNAME
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     if (
 
+
+
       hasUsername
+
+
 
     ) {
 
 
 
+
+
+
+
       const username =
+
+
 
         normalizeUsername(
 
+
+
           req.body?.username
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -3174,7 +6308,11 @@ export async function updateUserDetails(
 
       validateUsername(
 
+
+
         username
+
+
 
       );
 
@@ -3182,29 +6320,63 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       if (
+
+
 
         username.toLocaleLowerCase() !==
 
+
+
         existingUser.username
 
+
+
           .toLocaleLowerCase()
+
+
 
       ) {
 
 
 
+
+
+
+
         await ensureUsernameAvailable(
+
+
 
           username,
 
+
+
           userId
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3212,7 +6384,13 @@ export async function updateUserDetails(
 
       data.username =
 
+
+
         username;
+
+
+
+
 
 
 
@@ -3222,33 +6400,67 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // EMAIL
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     if (
 
+
+
       hasEmail
+
+
 
     ) {
 
 
 
+
+
+
+
       const email =
+
+
 
         String(
 
+
+
           req.body?.email ??
+
+
 
           ""
 
+
+
         )
 
+
+
           .trim()
+
+
 
           .toLowerCase();
 
@@ -3256,29 +6468,63 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       if (
+
+
 
         !email ||
 
+
+
         !isValidEmail(
+
+
 
           email
 
+
+
         )
+
+
 
       ) {
 
 
 
+
+
+
+
         throw new Error(
 
+
+
           "Valid email is required"
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3286,23 +6532,47 @@ export async function updateUserDetails(
 
       if (
 
+
+
         email.length >
 
+
+
         150
+
+
 
       ) {
 
 
 
+
+
+
+
         throw new Error(
 
+
+
           "Email is too long"
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3310,11 +6580,23 @@ export async function updateUserDetails(
 
       await ensureEmailAvailable(
 
+
+
         email,
+
+
 
         userId
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -3322,7 +6604,13 @@ export async function updateUserDetails(
 
       data.email =
 
+
+
         email;
+
+
+
+
 
 
 
@@ -3332,29 +6620,63 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     // ==================================================
+
+
 
     // MOBILE
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     if (
 
+
+
       hasMobile
+
+
 
     ) {
 
 
 
+
+
+
+
       const mobile =
+
+
 
         normalizeMobile(
 
+
+
           req.body?.mobile
 
+
+
         );
+
+
+
+
+
+
 
 
 
@@ -3362,25 +6684,51 @@ export async function updateUserDetails(
 
       if (
 
+
+
         !isValidMobile(
+
+
 
           mobile
 
+
+
         )
+
+
 
       ) {
 
 
 
+
+
+
+
         throw new Error(
 
+
+
           "Mobile number must contain exactly 10 digits"
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3388,11 +6736,23 @@ export async function updateUserDetails(
 
       await ensureMobileAvailable(
 
+
+
         mobile,
+
+
 
         userId
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -3400,110 +6760,223 @@ export async function updateUserDetails(
 
       data.mobile =
 
+
+
         mobile;
 
 
 
+
+
+
+
     }
 
 
 
 
 
+
+
+
+
+
+
     // ==================================================
+
     // PASSWORD
+
     //
+
     // Blank password = unchanged
+
     // Only SUPER_ADMIN can reset another user's password here.
+
     // ==================================================
+
+
 
     if (
+
       hasPassword
+
     ) {
 
+
+
       const password =
+
         String(
+
           req.body?.password ??
+
           ""
+
         );
 
 
+
+
+
       if (
+
         password.length >
+
         0
+
       ) {
 
+
+
         if (
+
           actor.role !==
+
           "SUPER_ADMIN"
+
         ) {
 
+
+
           return res
+
             .status(403)
+
             .json({
 
+
+
               success:
+
                 false,
 
+
+
               message:
+
                 "Only Super Admin can reset another user's password",
+
+
 
             });
 
+
+
         }
+
+
+
 
 
         if (
+
           password.length <
+
           8
+
         ) {
 
+
+
           throw new Error(
+
             "Password must be at least 8 characters"
+
           );
+
+
 
         }
 
 
+
+
+
         data.passwordHash =
+
           await bcrypt.hash(
+
             password,
+
             12
+
           );
 
 
+
+
+
         data.passwordChangedAt =
+
           new Date();
 
 
+
+
+
         data.passwordChangedBy =
+
           "ADMIN";
 
+
+
+        data.passwordChangedByUserId =
+
+          actor.userId;
+
+
+
       }
+
+
 
     }
 
 
 
+
+
+
+
     // ==================================================
+
+
 
     // FULL MANAGEMENT ONLY
 
+
+
     // ==================================================
+
+
+
+
 
 
 
     if (
 
+
+
       fullAccess
 
+
+
     ) {
+
+
+
+
 
 
 
       let nextRole =
 
+
+
         existingUser.role as
+
+
 
           AppUserRole;
 
@@ -3511,7 +6984,15 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       let nextIsActive =
+
+
 
         existingUser.isActive;
 
@@ -3519,29 +7000,63 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       // --------------------------------------------------
+
+
 
       // ROLE
 
+
+
       // --------------------------------------------------
+
+
+
+
 
 
 
       if (
 
+
+
         hasRole
+
+
 
       ) {
 
 
 
+
+
+
+
         const requestedRole =
+
+
 
           normalizeRole(
 
+
+
             req.body?.role
 
+
+
           );
+
+
+
+
+
+
 
 
 
@@ -3549,25 +7064,51 @@ export async function updateUserDetails(
 
         if (
 
+
+
           !CREATABLE_ROLES.includes(
+
+
 
             requestedRole
 
+
+
           )
+
+
 
         ) {
 
 
 
+
+
+
+
           throw new Error(
 
+
+
             "Invalid user role"
+
+
 
           );
 
 
 
+
+
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -3575,7 +7116,13 @@ export async function updateUserDetails(
 
         nextRole =
 
+
+
           requestedRole;
+
+
+
+
 
 
 
@@ -3585,41 +7132,87 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       // --------------------------------------------------
+
+
 
       // STATUS
 
+
+
       // --------------------------------------------------
+
+
+
+
 
 
 
       if (
 
+
+
         hasIsActive
+
+
 
       ) {
 
 
 
+
+
+
+
         if (
+
+
 
           typeof req.body?.isActive !==
 
+
+
           "boolean"
+
+
 
         ) {
 
 
 
+
+
+
+
           throw new Error(
 
+
+
             "isActive must be true or false"
+
+
 
           );
 
 
 
+
+
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -3627,7 +7220,13 @@ export async function updateUserDetails(
 
         nextIsActive =
 
+
+
           req.body.isActive;
+
+
+
+
 
 
 
@@ -3637,35 +7236,73 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       // --------------------------------------------------
+
+
 
       // CANNOT DEACTIVATE OWN ACCOUNT
 
+
+
       // --------------------------------------------------
+
+
+
+
 
 
 
       if (
 
+
+
         actor.userId ===
+
+
 
           userId &&
 
+
+
         existingUser.isActive &&
+
+
 
         nextIsActive ===
 
+
+
           false
 
+
+
       ) {
+
+
+
+
 
 
 
         throw new Error(
 
+
+
           "You cannot deactivate your own account"
 
+
+
         );
+
+
+
+
 
 
 
@@ -3675,31 +7312,63 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       // --------------------------------------------------
+
+
 
       // LAST ACTIVE SUPER ADMIN
 
+
+
       // --------------------------------------------------
+
+
+
+
 
 
 
       const removingActiveSuperAdmin =
 
+
+
         existingUser.role ===
+
+
 
           "SUPER_ADMIN" &&
 
+
+
         existingUser.isActive &&
+
+
 
         (
 
+
+
           nextRole !==
+
+
 
             "SUPER_ADMIN" ||
 
+
+
           nextIsActive ===
 
+
+
             false
+
+
 
         );
 
@@ -3707,23 +7376,51 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       if (
+
+
 
         removingActiveSuperAdmin
 
+
+
       ) {
+
+
+
+
 
 
 
         await ensureAnotherActiveSuperAdminExists(
 
+
+
           existingUser.id
+
+
 
         );
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3731,15 +7428,29 @@ export async function updateUserDetails(
 
       if (
 
+
+
         hasRole
 
+
+
       ) {
+
+
+
+
 
 
 
         data.role =
 
+
+
           nextRole;
+
+
+
+
 
 
 
@@ -3749,93 +7460,189 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
       // --------------------------------------------------
+
+
 
       // UNIT
 
+
+
       // --------------------------------------------------
+
+
+
+
 
 
 
       if (
 
+
+
         hasRole ||
+
+
 
         hasUnitCode
 
+
+
       ) {
+
+
+
+
 
 
 
         if (
 
+
+
           nextRole ===
 
+
+
           "INCHARGE_DIRECTOR"
+
+
 
         ) {
 
 
 
+
+
+
+
           if (
+
+
 
             hasUnitCode &&
 
+
+
             String(
+
+
 
               req.body?.unitCode ??
 
+
+
               ""
 
+
+
             ).trim()
+
+
 
           ) {
 
 
 
+
+
+
+
             data.unitId =
+
+
 
               await getUnitIdForRole(
 
+
+
                 nextRole,
 
+
+
                 req.body?.unitCode
+
+
 
               );
 
 
 
+
+
+
+
           }
+
+
 
           else if (
 
+
+
             existingUser.role ===
+
+
 
               "INCHARGE_DIRECTOR" &&
 
+
+
             existingUser.unitId
+
+
 
           ) {
 
 
 
+
+
+
+
             data.unitId =
+
+
 
               existingUser.unitId;
 
 
 
+
+
+
+
           }
+
+
 
           else {
 
 
 
+
+
+
+
             throw new Error(
+
+
 
               "Unit is required for Incharge Director"
 
+
+
             );
+
+
+
+
 
 
 
@@ -3843,15 +7650,31 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
         }
+
+
 
         else {
 
 
 
+
+
+
+
           data.unitId =
 
+
+
             null;
+
+
+
+
 
 
 
@@ -3859,7 +7682,17 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -3867,19 +7700,37 @@ export async function updateUserDetails(
 
       if (
 
+
+
         hasIsActive
+
+
 
       ) {
 
 
 
+
+
+
+
         data.isActive =
+
+
 
           nextIsActive;
 
 
 
+
+
+
+
       }
+
+
+
+
 
 
 
@@ -3889,9 +7740,21 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     const updatedUser =
 
+
+
       await prisma.user.update({
+
+
+
+
 
 
 
@@ -3899,9 +7762,19 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
           id:
 
+
+
             userId,
+
+
+
+
 
 
 
@@ -3909,19 +7782,41 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
         data:
+
+
 
           data as any,
 
 
 
+
+
+
+
         select:
+
+
 
           PUBLIC_USER_SELECT,
 
 
 
+
+
+
+
       });
+
+
+
+
+
+
 
 
 
@@ -3929,27 +7824,53 @@ export async function updateUserDetails(
 
     return res
 
+
+
       .status(200)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           true,
 
 
 
+
+
+
+
         message:
+
+
 
           "User details updated successfully",
 
 
 
+
+
+
+
         data:
 
+
+
           updatedUser,
+
+
+
+
 
 
 
@@ -3957,21 +7878,41 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
   }
+
+
 
   catch (
 
+
+
     error
+
+
 
   ) {
 
 
 
+
+
+
+
     const message =
+
+
 
       error instanceof Error
 
+
+
         ? error.message
+
+
 
         : "Unable to update user details";
 
@@ -3979,17 +7920,37 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
+
+
     return res
 
+
+
       .status(400)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
 
+
+
           false,
+
+
+
+
 
 
 
@@ -3997,11 +7958,23 @@ export async function updateUserDetails(
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4011,355 +7984,697 @@ export async function updateUserDetails(
 
 
 
-// ======================================================
-// CHANGE OWN PASSWORD
+
+
+
+
+
+
 // ======================================================
 
+// CHANGE OWN PASSWORD
+
+// ======================================================
+
+
+
 export async function changeOwnPassword(
+
   req: AuthenticatedRequest,
+
   res: Response
+
 ) {
+
+
 
   try {
 
+
+
     const actor =
+
       ensureAuthenticated(
+
         req
+
       );
+
+
+
 
 
     const currentPassword =
+
       String(
+
         req.body?.currentPassword ??
+
         ""
+
       );
+
+
+
 
 
     const newPassword =
+
       String(
+
         req.body?.newPassword ??
+
         ""
+
       );
 
 
+
+
+
     if (
+
       !currentPassword
+
     ) {
 
+
+
       throw new Error(
+
         "Current password is required"
+
       );
 
+
+
     }
+
+
+
 
 
     if (
+
       newPassword.length <
+
       8
+
     ) {
 
+
+
       throw new Error(
+
         "New password must be at least 8 characters"
+
       );
 
+
+
     }
+
+
+
 
 
     const user =
+
       await prisma.user.findUnique({
 
+
+
         where: {
+
           id:
+
             actor.userId,
+
         },
+
+
 
         select: {
+
           id:
+
             true,
+
+
 
           passwordHash:
+
             true,
 
+
+
           isActive:
+
             true,
+
         },
+
+
 
       });
 
 
+
+
+
     if (
+
       !user ||
+
       !user.isActive
+
     ) {
 
+
+
       return res
+
         .status(404)
+
         .json({
 
+
+
           success:
+
             false,
 
+
+
           message:
+
             "Active user account not found",
+
+
 
         });
 
+
+
     }
+
+
+
 
 
     const currentPasswordMatches =
+
       await bcrypt.compare(
+
         currentPassword,
+
         user.passwordHash
+
       );
 
 
+
+
+
     if (
+
       !currentPasswordMatches
+
     ) {
 
+
+
       return res
+
         .status(400)
+
         .json({
 
+
+
           success:
+
             false,
 
+
+
           message:
+
             "Current password is incorrect",
+
+
 
         });
 
+
+
     }
+
+
+
 
 
     const sameAsCurrent =
+
       await bcrypt.compare(
+
         newPassword,
+
         user.passwordHash
+
       );
+
+
+
 
 
     if (
+
       sameAsCurrent
+
     ) {
 
+
+
       throw new Error(
+
         "New password must be different from current password"
+
       );
 
+
+
     }
+
+
+
 
 
     const passwordHash =
+
       await bcrypt.hash(
+
         newPassword,
+
         12
+
       );
+
+
+
 
 
     const updatedUser =
+
       await prisma.user.update({
 
+
+
         where: {
+
           id:
+
             actor.userId,
+
         },
+
+
 
         data: {
+
           passwordHash,
 
+
+
           passwordChangedAt:
+
             new Date(),
 
+
+
           passwordChangedBy:
+
             "SELF" as any,
+
+
+
+          passwordChangedByUserId:
+
+            actor.userId,
+
         },
+
+
 
         select: {
+
           id:
+
             true,
+
+
 
           passwordChangedAt:
+
             true,
+
+
 
           passwordChangedBy:
+
             true,
+
         },
 
+
+
       });
 
 
+
+
+
     return res
+
       .status(200)
+
       .json({
 
+
+
         success:
+
           true,
 
+
+
         message:
+
           "Password changed successfully",
 
+
+
         data:
+
           updatedUser,
 
+
+
       });
 
+
+
   }
+
   catch (
+
     error
+
   ) {
 
+
+
     return res
+
       .status(400)
+
       .json({
 
+
+
         success:
+
           false,
 
+
+
         message:
+
           error instanceof Error
+
             ? error.message
+
             : "Unable to change password",
+
+
 
       });
 
+
+
   }
+
+
 
 }
 
 
-// ======================================================
-// SUPER ADMIN PASSWORD STATUS
+
+
+
 // ======================================================
 
+// PASSWORD STATUS
+
+// ======================================================
+
+
+
 export async function getUserPasswordStatus(
+
   req: AuthenticatedRequest,
+
   res: Response
+
 ) {
+
+
 
   try {
 
-    const actor =
-      ensureAuthenticated(
-        req
-      );
+    ensureFullManagementAccess(
+      req
+    );
 
 
-    if (
-      actor.role !==
-      "SUPER_ADMIN"
-    ) {
 
-      return res
-        .status(403)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Only Super Admin can view password status",
-
-        });
-
-    }
 
 
     const userId =
+
       getUserId(
+
         req.params.id
+
       );
 
 
+
+
+
     const user =
+
       await prisma.user.findUnique({
 
+
+
         where: {
+
           id:
+
             userId,
+
         },
+
+
 
         select: {
+
           id:
+
             true,
+
+
 
           name:
+
             true,
+
+
 
           username:
+
             true,
+
+
 
           passwordChangedAt:
+
             true,
 
+
+
           passwordChangedBy:
+
             true,
+
+
+
+          passwordChangedByUser:
+
+            {
+
+              select: {
+
+                id: true,
+
+                name: true,
+
+                username: true,
+
+                role: true,
+
+              },
+
+            },
+
         },
+
+
 
       });
 
 
+
+
+
     if (
+
       !user
+
     ) {
 
+
+
       return res
+
         .status(404)
+
         .json({
 
+
+
           success:
+
             false,
 
+
+
           message:
+
             "User not found",
 
+
+
         });
+
+
 
     }
 
 
+
+
+
     return res
+
       .status(200)
+
       .json({
 
+
+
         success:
+
           true,
 
+
+
         data:
+
           user,
 
+
+
       });
 
+
+
   }
+
   catch (
+
     error
+
   ) {
 
+
+
     return res
+
       .status(400)
+
       .json({
 
+
+
         success:
+
           false,
 
+
+
         message:
+
           error instanceof Error
+
             ? error.message
+
             : "Unable to load password status",
+
+
 
       });
 
+
+
   }
+
+
 
 }
 
 
+
+
+
 // ======================================================
-// SUPER ADMIN RESET PASSWORD
+// RESET PASSWORD
 //
-// If password is omitted, a temporary password is generated.
-// Plain password is returned only in this response.
+// FULL MANAGEMENT ONLY:
+// SUPER_ADMIN
+// MASTER_ADMIN
+// ADMIN
+// DIRECTOR
+//
+// Body:
+// {
+//   "newPassword": "new password",
+//   "confirmPassword": "new password"
+// }
+//
+// Minimum 6 characters.
+// Password may contain letters, numbers, symbols or spaces.
 // Database stores only the bcrypt hash.
 // ======================================================
 
@@ -4371,36 +8686,14 @@ export async function resetUserPassword(
   try {
 
     const actor =
-      ensureAuthenticated(
+      ensureFullManagementAccess(
         req
       );
-
-
-    if (
-      actor.role !==
-      "SUPER_ADMIN"
-    ) {
-
-      return res
-        .status(403)
-        .json({
-
-          success:
-            false,
-
-          message:
-            "Only Super Admin can reset user passwords",
-
-        });
-
-    }
-
 
     const userId =
       getUserId(
         req.params.id
       );
-
 
     const target =
       await prisma.user.findUnique({
@@ -4420,12 +8713,14 @@ export async function resetUserPassword(
           username:
             true,
 
+          passwordHash:
+            true,
+
           isActive:
             true,
         },
 
       });
-
 
     if (
       !target
@@ -4445,39 +8740,86 @@ export async function resetUserPassword(
 
     }
 
-
-    const requestedPassword =
+    const newPassword =
       String(
-        req.body?.password ??
+        req.body?.newPassword ??
         ""
       );
 
-
-    const temporaryPassword =
-      requestedPassword.length >
-      0
-        ? requestedPassword
-        : generateTemporaryPassword();
-
+    const confirmPassword =
+      String(
+        req.body?.confirmPassword ??
+        ""
+      );
 
     if (
-      temporaryPassword.length <
-      8
+      !newPassword ||
+      !newPassword.trim()
     ) {
 
       throw new Error(
-        "Password must be at least 8 characters"
+        "New password is required"
       );
 
     }
 
+    if (
+      newPassword.length <
+      6
+    ) {
+
+      throw new Error(
+        "New password must be at least 6 characters"
+      );
+
+    }
+
+    if (
+      newPassword.length >
+      128
+    ) {
+
+      throw new Error(
+        "New password must not exceed 128 characters"
+      );
+
+    }
+
+    if (
+      newPassword !==
+      confirmPassword
+    ) {
+
+      throw new Error(
+        "New password and confirm password do not match"
+      );
+
+    }
+
+    const sameAsCurrentPassword =
+      await bcrypt.compare(
+        newPassword,
+        target.passwordHash
+      );
+
+    if (
+      sameAsCurrentPassword
+    ) {
+
+      throw new Error(
+        "New password must be different from current password"
+      );
+
+    }
 
     const passwordHash =
       await bcrypt.hash(
-        temporaryPassword,
+        newPassword,
         12
       );
 
+    const changedAt =
+      new Date();
 
     const updatedUser =
       await prisma.user.update({
@@ -4491,10 +8833,13 @@ export async function resetUserPassword(
           passwordHash,
 
           passwordChangedAt:
-            new Date(),
+            changedAt,
 
           passwordChangedBy:
             "ADMIN" as any,
+
+          passwordChangedByUserId:
+            actor.userId,
         },
 
         select: {
@@ -4512,10 +8857,18 @@ export async function resetUserPassword(
 
           passwordChangedBy:
             true,
+
+          passwordChangedByUser: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              role: true,
+            },
+          },
         },
 
       });
-
 
     return res
       .status(200)
@@ -4525,13 +8878,10 @@ export async function resetUserPassword(
           true,
 
         message:
-          "Password reset successfully. This password is shown only in this response.",
+          "Password reset successfully",
 
-        data: {
-          ...updatedUser,
-
-          temporaryPassword,
-        },
+        data:
+          updatedUser,
 
       });
 
@@ -4561,23 +8911,45 @@ export async function resetUserPassword(
 
 // ======================================================
 
+
+
 // ACTIVE / INACTIVE
+
+
 
 //
 
+
+
 // FULL MANAGEMENT ONLY
+
+
 
 // ======================================================
 
 
 
+
+
+
+
 export async function updateUserStatus(
+
+
 
   req: AuthenticatedRequest,
 
+
+
   res: Response
 
+
+
 ) {
+
+
+
+
 
 
 
@@ -4585,13 +8957,29 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
     const actor =
+
+
 
       ensureFullManagementAccess(
 
+
+
         req
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -4599,11 +8987,23 @@ export async function updateUserStatus(
 
     const userId =
 
+
+
       getUserId(
+
+
 
         req.params.id
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -4611,31 +9011,63 @@ export async function updateUserStatus(
 
     const isActive =
 
+
+
       req.body?.isActive;
 
 
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       typeof isActive !==
 
+
+
       "boolean"
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
 
+
+
         "isActive must be true or false"
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -4643,27 +9075,55 @@ export async function updateUserStatus(
 
     if (
 
+
+
       actor.userId ===
+
+
 
         userId &&
 
+
+
       isActive ===
 
+
+
         false
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
 
+
+
         "You cannot deactivate your own account"
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -4671,7 +9131,13 @@ export async function updateUserStatus(
 
     const target =
 
+
+
       await prisma.user.findUnique({
+
+
+
+
 
 
 
@@ -4679,13 +9145,27 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
           id:
+
+
 
             userId,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -4693,25 +9173,51 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
           id:
 
+
+
             true,
+
+
+
+
 
 
 
           role:
 
+
+
             true,
+
+
+
+
 
 
 
           isActive:
 
+
+
             true,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -4721,31 +9227,65 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
+
+
     if (
 
+
+
       !target
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(404)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
 
+
+
             "User not found",
+
+
+
+
 
 
 
@@ -4753,7 +9293,17 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -4761,25 +9311,49 @@ export async function updateUserStatus(
 
     if (
 
+
+
       target.role ===
+
+
 
         "SUPER_ADMIN" &&
 
+
+
       target.isActive &&
+
+
 
       isActive ===
 
+
+
         false
+
+
 
     ) {
 
 
 
+
+
+
+
       await ensureAnotherActiveSuperAdminExists(
+
+
 
         target.id
 
+
+
       );
+
+
+
+
 
 
 
@@ -4789,9 +9363,21 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
+
+
     const updatedUser =
 
+
+
       await prisma.user.update({
+
+
+
+
 
 
 
@@ -4799,9 +9385,19 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
           id:
 
+
+
             userId,
+
+
+
+
 
 
 
@@ -4809,7 +9405,15 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
         data: {
+
+
+
+
 
 
 
@@ -4817,17 +9421,37 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
         select:
 
+
+
           PUBLIC_USER_SELECT,
 
 
 
+
+
+
+
       });
+
+
+
+
+
+
 
 
 
@@ -4835,31 +9459,61 @@ export async function updateUserStatus(
 
     return res
 
+
+
       .status(200)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           true,
 
 
 
+
+
+
+
         message:
+
+
 
           isActive
 
+
+
             ? "User activated successfully"
+
+
 
             : "User deactivated successfully",
 
 
 
+
+
+
+
         data:
 
+
+
           updatedUser,
+
+
+
+
 
 
 
@@ -4867,21 +9521,41 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
   }
+
+
 
   catch (
 
+
+
     error
+
+
 
   ) {
 
 
 
+
+
+
+
     const message =
+
+
 
       error instanceof Error
 
+
+
         ? error.message
+
+
 
         : "Unable to update user status";
 
@@ -4889,9 +9563,19 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
+
+
     const forbidden =
 
+
+
       message ===
+
+
 
       "You do not have permission to manage users";
 
@@ -4899,25 +9583,53 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
+
+
     return res
+
+
 
       .status(
 
+
+
         forbidden
+
+
 
           ? 403
 
+
+
           : 400
 
+
+
       )
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
 
+
+
           false,
+
+
+
+
 
 
 
@@ -4925,11 +9637,23 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -4939,25 +9663,53 @@ export async function updateUserStatus(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // CHANGE ROLE
 
+
+
 //
+
+
 
 // FULL MANAGEMENT ONLY
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 export async function changeUserRole(
 
+
+
   req: AuthenticatedRequest,
+
+
 
   res: Response
 
+
+
 ) {
+
+
+
+
 
 
 
@@ -4965,9 +9717,17 @@ export async function changeUserRole(
 
 
 
+
+
+
+
     ensureFullManagementAccess(
 
+
+
       req
+
+
 
     );
 
@@ -4975,13 +9735,31 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
     const userId =
+
+
 
       getUserId(
 
+
+
         req.params.id
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -4989,11 +9767,23 @@ export async function changeUserRole(
 
     const role =
 
+
+
       normalizeRole(
+
+
 
         req.body?.role
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -5001,25 +9791,51 @@ export async function changeUserRole(
 
     if (
 
+
+
       !CREATABLE_ROLES.includes(
+
+
 
         role
 
+
+
       )
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
 
+
+
         "Invalid user role"
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -5027,7 +9843,13 @@ export async function changeUserRole(
 
     const target =
 
+
+
       await prisma.user.findUnique({
+
+
+
+
 
 
 
@@ -5035,13 +9857,27 @@ export async function changeUserRole(
 
 
 
+
+
+
+
           id:
+
+
 
             userId,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -5049,31 +9885,63 @@ export async function changeUserRole(
 
 
 
+
+
+
+
           id:
 
+
+
             true,
+
+
+
+
 
 
 
           role:
 
+
+
             true,
+
+
+
+
 
 
 
           unitId:
 
+
+
             true,
+
+
+
+
 
 
 
           isActive:
 
+
+
             true,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -5083,31 +9951,65 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
     if (
 
+
+
       !target
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(404)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
 
+
+
             "User not found",
+
+
+
+
 
 
 
@@ -5115,7 +10017,17 @@ export async function changeUserRole(
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -5123,29 +10035,59 @@ export async function changeUserRole(
 
     if (
 
+
+
       target.role ===
+
+
 
         "SUPER_ADMIN" &&
 
+
+
       target.isActive &&
+
+
 
       role !==
 
+
+
         "SUPER_ADMIN"
+
+
 
     ) {
 
 
 
+
+
+
+
       await ensureAnotherActiveSuperAdminExists(
 
+
+
         target.id
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -5153,7 +10095,11 @@ export async function changeUserRole(
 
     let unitId:
 
+
+
       number |
+
+
 
       null;
 
@@ -5161,23 +10107,47 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
     if (
+
+
 
       role ===
 
+
+
       "INCHARGE_DIRECTOR"
+
+
 
     ) {
 
 
 
+
+
+
+
       const unitCode =
+
+
 
         String(
 
+
+
           req.body?.unitCode ??
 
+
+
           ""
+
+
 
         ).trim();
 
@@ -5185,57 +10155,117 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
       if (
 
+
+
         unitCode
+
+
 
       ) {
 
 
 
+
+
+
+
         unitId =
+
+
 
           await getUnitIdForRole(
 
+
+
             role,
 
+
+
             unitCode
+
+
 
           );
 
 
 
+
+
+
+
       }
+
+
 
       else if (
 
+
+
         target.role ===
+
+
 
           "INCHARGE_DIRECTOR" &&
 
+
+
         target.unitId
+
+
 
       ) {
 
 
 
+
+
+
+
         unitId =
+
+
 
           target.unitId;
 
 
 
+
+
+
+
       }
+
+
 
       else {
 
 
 
+
+
+
+
         throw new Error(
+
+
 
           "Unit is required for Incharge Director"
 
+
+
         );
+
+
+
+
 
 
 
@@ -5243,19 +10273,41 @@ export async function changeUserRole(
 
 
 
+
+
+
+
     }
+
+
 
     else {
 
 
 
+
+
+
+
       unitId =
+
+
 
         null;
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -5263,7 +10315,13 @@ export async function changeUserRole(
 
     const updatedUser =
 
+
+
       await prisma.user.update({
+
+
+
+
 
 
 
@@ -5271,13 +10329,27 @@ export async function changeUserRole(
 
 
 
+
+
+
+
           id:
+
+
 
             userId,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -5285,9 +10357,19 @@ export async function changeUserRole(
 
 
 
+
+
+
+
           role:
 
+
+
             role as any,
+
+
+
+
 
 
 
@@ -5295,17 +10377,37 @@ export async function changeUserRole(
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
         select:
 
+
+
           PUBLIC_USER_SELECT,
 
 
 
+
+
+
+
       });
+
+
+
+
+
+
 
 
 
@@ -5313,27 +10415,53 @@ export async function changeUserRole(
 
     return res
 
+
+
       .status(200)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           true,
 
 
 
+
+
+
+
         message:
+
+
 
           "User role updated successfully",
 
 
 
+
+
+
+
         data:
 
+
+
           updatedUser,
+
+
+
+
 
 
 
@@ -5341,21 +10469,41 @@ export async function changeUserRole(
 
 
 
+
+
+
+
   }
+
+
 
   catch (
 
+
+
     error
+
+
 
   ) {
 
 
 
+
+
+
+
     const message =
+
+
 
       error instanceof Error
 
+
+
         ? error.message
+
+
 
         : "Unable to change user role";
 
@@ -5363,9 +10511,19 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
     const forbidden =
 
+
+
       message ===
+
+
 
       "You do not have permission to manage users";
 
@@ -5373,25 +10531,53 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
     return res
+
+
 
       .status(
 
+
+
         forbidden
+
+
 
           ? 403
 
+
+
           : 400
 
+
+
       )
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
 
+
+
           false,
+
+
+
+
 
 
 
@@ -5399,11 +10585,23 @@ export async function changeUserRole(
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
@@ -5413,25 +10611,53 @@ export async function changeUserRole(
 
 
 
+
+
+
+
+
+
 // ======================================================
+
+
 
 // DELETE USER
 
+
+
 //
+
+
 
 // FULL MANAGEMENT ONLY
 
+
+
 // ======================================================
+
+
+
+
 
 
 
 export async function deleteUser(
 
+
+
   req: AuthenticatedRequest,
+
+
 
   res: Response
 
+
+
 ) {
+
+
+
+
 
 
 
@@ -5439,13 +10665,29 @@ export async function deleteUser(
 
 
 
+
+
+
+
     const actor =
+
+
 
       ensureFullManagementAccess(
 
+
+
         req
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -5453,11 +10695,23 @@ export async function deleteUser(
 
     const userId =
 
+
+
       getUserId(
+
+
 
         req.params.id
 
+
+
       );
+
+
+
+
+
+
 
 
 
@@ -5465,19 +10719,37 @@ export async function deleteUser(
 
     if (
 
+
+
       actor.userId ===
 
+
+
       userId
+
+
 
     ) {
 
 
 
+
+
+
+
       throw new Error(
+
+
 
         "You cannot delete your own account"
 
+
+
       );
+
+
+
+
 
 
 
@@ -5487,9 +10759,21 @@ export async function deleteUser(
 
 
 
+
+
+
+
+
+
     const target =
 
+
+
       await prisma.user.findUnique({
+
+
+
+
 
 
 
@@ -5497,13 +10781,27 @@ export async function deleteUser(
 
 
 
+
+
+
+
           id:
+
+
 
             userId,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -5511,37 +10809,75 @@ export async function deleteUser(
 
 
 
+
+
+
+
           id:
 
+
+
             true,
+
+
+
+
 
 
 
           name:
 
+
+
             true,
+
+
+
+
 
 
 
           username:
 
+
+
             true,
+
+
+
+
 
 
 
           role:
 
+
+
             true,
+
+
+
+
 
 
 
           isActive:
 
+
+
             true,
 
 
 
+
+
+
+
         },
+
+
+
+
 
 
 
@@ -5551,31 +10887,65 @@ export async function deleteUser(
 
 
 
+
+
+
+
+
+
     if (
 
+
+
       !target
+
+
 
     ) {
 
 
 
+
+
+
+
       return res
 
+
+
         .status(404)
+
+
 
         .json({
 
 
 
+
+
+
+
           success:
+
+
 
             false,
 
 
 
+
+
+
+
           message:
 
+
+
             "User not found",
+
+
+
+
 
 
 
@@ -5583,7 +10953,17 @@ export async function deleteUser(
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -5591,25 +10971,51 @@ export async function deleteUser(
 
     if (
 
+
+
       target.role ===
+
+
 
         "SUPER_ADMIN" &&
 
+
+
       target.isActive
+
+
 
     ) {
 
 
 
+
+
+
+
       await ensureAnotherActiveSuperAdminExists(
 
+
+
         target.id
+
+
 
       );
 
 
 
+
+
+
+
     }
+
+
+
+
+
+
 
 
 
@@ -5619,17 +11025,35 @@ export async function deleteUser(
 
 
 
+
+
+
+
       where: {
+
+
+
+
 
 
 
         id:
 
+
+
           userId,
 
 
 
+
+
+
+
       },
+
+
+
+
 
 
 
@@ -5639,23 +11063,49 @@ export async function deleteUser(
 
 
 
+
+
+
+
+
+
     return res
 
+
+
       .status(200)
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
+
+
 
           true,
 
 
 
+
+
+
+
         message:
 
+
+
           "User deleted successfully",
+
+
+
+
 
 
 
@@ -5663,21 +11113,43 @@ export async function deleteUser(
 
 
 
+
+
+
+
           id:
+
+
 
             target.id,
 
 
 
+
+
+
+
           name:
+
+
 
             target.name,
 
 
 
+
+
+
+
           username:
 
+
+
             target.username,
+
+
+
+
 
 
 
@@ -5685,25 +11157,49 @@ export async function deleteUser(
 
 
 
+
+
+
+
       });
+
+
+
+
 
 
 
   }
 
+
+
   catch (
 
+
+
     error
+
+
 
   ) {
 
 
 
+
+
+
+
     const message =
+
+
 
       error instanceof Error
 
+
+
         ? error.message
+
+
 
         : "Unable to delete user";
 
@@ -5711,9 +11207,19 @@ export async function deleteUser(
 
 
 
+
+
+
+
+
+
     const forbidden =
 
+
+
       message ===
+
+
 
       "You do not have permission to manage users";
 
@@ -5721,25 +11227,53 @@ export async function deleteUser(
 
 
 
+
+
+
+
+
+
     return res
+
+
 
       .status(
 
+
+
         forbidden
+
+
 
           ? 403
 
+
+
           : 400
 
+
+
       )
+
+
 
       .json({
 
 
 
+
+
+
+
         success:
 
+
+
           false,
+
+
+
+
 
 
 
@@ -5747,11 +11281,23 @@ export async function deleteUser(
 
 
 
+
+
+
+
       });
 
 
 
+
+
+
+
   }
+
+
+
+
 
 
 
