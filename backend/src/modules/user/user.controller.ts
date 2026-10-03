@@ -11164,11 +11164,6 @@ export async function deleteUser(
       });
 
 
-
-
-
-
-
   }
 
 
@@ -11176,18 +11171,9 @@ export async function deleteUser(
   catch (
 
 
-
     error
 
-
-
   ) {
-
-
-
-
-
-
 
     const message =
 
@@ -11196,42 +11182,18 @@ export async function deleteUser(
       error instanceof Error
 
 
-
         ? error.message
-
 
 
         : "Unable to delete user";
 
 
-
-
-
-
-
-
-
-
-
     const forbidden =
-
-
 
       message ===
 
 
-
       "You do not have permission to manage users";
-
-
-
-
-
-
-
-
-
-
 
     return res
 
