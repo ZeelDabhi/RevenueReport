@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
 } from "react";
 
@@ -17,9 +18,23 @@ import api from "../services/api";
 import "./DailyUploadPage.css";
 
 
+// ======================================================
+// TYPES
+// ======================================================
+
 type UnitOption = {
+  id: number;
   code: string;
   name: string;
+  isActive: boolean;
+};
+
+
+type UnitsResponse = {
+  success?: boolean;
+  total?: number;
+  data?: UnitOption[];
+  message?: string;
 };
 
 
@@ -29,37 +44,9 @@ type UploadResponse = {
 };
 
 
-const UNITS: UnitOption[] = [
-  {
-    code: "MB",
-    name: "Morbi",
-  },
-  {
-    code: "OS",
-    name: "Oswal",
-  },
-  {
-    code: "SV",
-    name: "Surendranagar",
-  },
-  {
-    code: "MS",
-    name: "Mehsana",
-  },
-  {
-    code: "BJ",
-    name: "Bhuj",
-  },
-  {
-    code: "JN",
-    name: "Junagadh",
-  },
-  {
-    code: "SM",
-    name: "Samarpan",
-  },
-];
-
+// ======================================================
+// YESTERDAY DATE
+// ======================================================
 
 function getYesterdayDate(): string {
 
@@ -98,7 +85,46 @@ function getYesterdayDate(): string {
 }
 
 
+// ======================================================
+// PAGE
+// ======================================================
+
 function DailyUploadPage() {
+
+  // ====================================================
+  // ACTIVE UNITS
+  // ====================================================
+
+  const [
+    units,
+    setUnits,
+  ] =
+    useState<UnitOption[]>(
+      []
+    );
+
+
+  const [
+    unitsLoading,
+    setUnitsLoading,
+  ] =
+    useState(
+      true
+    );
+
+
+  const [
+    unitsError,
+    setUnitsError,
+  ] =
+    useState(
+      ""
+    );
+
+
+  // ====================================================
+  // FORM
+  // ====================================================
 
   const [
     unitCode,
@@ -164,6 +190,200 @@ function DailyUploadPage() {
     useState("");
 
 
+  // ====================================================
+  // LOAD ACTIVE UNITS
+  //
+  // GET /api/v1/units
+  //
+  // Only isActive = true units are returned by backend.
+  // Future unit activation does not require frontend edit.
+  // ====================================================
+
+  useEffect(
+    () => {
+
+      let active =
+        true;
+
+
+      const controller =
+        new AbortController();
+
+
+      const loadUnits =
+        async () => {
+
+          try {
+
+            setUnitsLoading(
+              true
+            );
+
+            setUnitsError(
+              ""
+            );
+
+
+            const response =
+              await api.get<UnitsResponse>(
+                "/units",
+                {
+                  signal:
+                    controller.signal,
+                }
+              );
+
+
+            if (
+              !active
+            ) {
+
+              return;
+
+            }
+
+
+            const activeUnits =
+              Array.isArray(
+                response.data.data
+              )
+                ? response.data.data
+                : [];
+
+
+            setUnits(
+              activeUnits
+            );
+
+
+            // If selected unit is no longer active,
+            // clear the selection.
+            setUnitCode(
+              (
+                current
+              ) => {
+
+                if (
+                  !current
+                ) {
+
+                  return current;
+
+                }
+
+
+                const exists =
+                  activeUnits.some(
+                    (
+                      unit
+                    ) =>
+                      unit.code ===
+                      current
+                  );
+
+
+                return exists
+                  ? current
+                  : "";
+
+              }
+            );
+
+          }
+          catch (
+            error
+          ) {
+
+            if (
+              !active
+            ) {
+
+              return;
+
+            }
+
+
+            if (
+              axios.isCancel(
+                error
+              )
+            ) {
+
+              return;
+
+            }
+
+
+            if (
+              axios.isAxiosError(
+                error
+              )
+            ) {
+
+              const data =
+                error.response?.data as
+                  | UnitsResponse
+                  | undefined;
+
+
+              setUnitsError(
+                data?.message ||
+                "Unable to load active units."
+              );
+
+            }
+            else {
+
+              setUnitsError(
+                "Unable to load active units."
+              );
+
+            }
+
+
+            setUnits(
+              []
+            );
+
+          }
+          finally {
+
+            if (
+              active
+            ) {
+
+              setUnitsLoading(
+                false
+              );
+
+            }
+
+          }
+
+        };
+
+
+      void loadUnits();
+
+
+      return () => {
+
+        active =
+          false;
+
+        controller.abort();
+
+      };
+
+    },
+    []
+  );
+
+
+  // ====================================================
+  // RESET FILES
+  // ====================================================
+
   const resetFiles =
     () => {
 
@@ -182,6 +402,10 @@ function DailyUploadPage() {
     };
 
 
+  // ====================================================
+  // UPLOAD
+  // ====================================================
+
   const handleUpload =
     async () => {
 
@@ -195,11 +419,64 @@ function DailyUploadPage() {
 
 
       if (
+        unitsLoading
+      ) {
+
+        setErrorMessage(
+          "Please wait while active units are loading."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        unitsError
+      ) {
+
+        setErrorMessage(
+          unitsError
+        );
+
+        return;
+
+      }
+
+
+      if (
         !unitCode
       ) {
 
         setErrorMessage(
           "Please select a unit."
+        );
+
+        return;
+
+      }
+
+
+      const selectedUnitIsActive =
+        units.some(
+          (
+            unit
+          ) =>
+            unit.code ===
+            unitCode
+        );
+
+
+      if (
+        !selectedUnitIsActive
+      ) {
+
+        setErrorMessage(
+          "Selected unit is not active."
+        );
+
+        setUnitCode(
+          ""
         );
 
         return;
@@ -334,6 +611,10 @@ function DailyUploadPage() {
     };
 
 
+  // ====================================================
+  // UI
+  // ====================================================
+
   return (
 
     <div className="daily-upload-page">
@@ -396,6 +677,13 @@ function DailyUploadPage() {
 
             <select
               value={unitCode}
+              disabled={
+                unitsLoading ||
+                loading ||
+                Boolean(
+                  unitsError
+                )
+              }
               onChange={
                 (
                   event
@@ -407,17 +695,28 @@ function DailyUploadPage() {
             >
 
               <option value="">
-                Select Unit
+
+                {
+                  unitsLoading
+                    ? "Loading Units..."
+                    : unitsError
+                      ? "Unable to Load Units"
+                      : units.length === 0
+                        ? "No Active Units"
+                        : "Select Unit"
+                }
+
               </option>
 
+
               {
-                UNITS.map(
+                units.map(
                   (
                     unit
                   ) => (
 
                     <option
-                      key={unit.code}
+                      key={unit.id}
                       value={unit.code}
                     >
                       {unit.code} - {unit.name}
@@ -462,6 +761,17 @@ function DailyUploadPage() {
           </div>
 
         </div>
+
+
+        {
+          unitsError && (
+
+            <div className="daily-upload-message error">
+              {unitsError}
+            </div>
+
+          )
+        }
 
 
         <div className="daily-upload-files">
@@ -553,7 +863,12 @@ function DailyUploadPage() {
               handleUpload
             }
             disabled={
-              loading
+              loading ||
+              unitsLoading ||
+              Boolean(
+                unitsError
+              ) ||
+              units.length === 0
             }
           >
 
@@ -561,21 +876,25 @@ function DailyUploadPage() {
               loading
                 ? (
                   <>
+
                     <RefreshCw
                       size={17}
                       className="daily-upload-spin"
                     />
 
                     Uploading...
+
                   </>
                 )
                 : (
                   <>
+
                     <UploadCloud
                       size={17}
                     />
 
                     Upload Revenue
+
                   </>
                 )
             }
@@ -592,6 +911,10 @@ function DailyUploadPage() {
 
 }
 
+
+// ======================================================
+// UPLOAD FILE BOX
+// ======================================================
 
 type UploadFileBoxProps = {
 
@@ -658,7 +981,6 @@ function UploadFileBox(
         {
           file
             ? (
-
               <>
 
                 <CheckCircle2
@@ -674,10 +996,8 @@ function UploadFileBox(
                 </span>
 
               </>
-
             )
             : (
-
               <>
 
                 <FileText
@@ -693,7 +1013,6 @@ function UploadFileBox(
                 </span>
 
               </>
-
             )
         }
 

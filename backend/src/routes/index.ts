@@ -16,6 +16,9 @@ import {
 import userRoutes
   from "../modules/user/user.routes.ts";
 
+import unitRoutes
+  from "../modules/unit/unit.routes.ts";
+
 import revenueRoutes
   from "../modules/revenue/revenue.routes.ts";
 
@@ -147,15 +150,31 @@ router.use(
 //
 // Authentication + role permissions are handled
 // inside user.routes.ts.
-//
-// GET   /api/v1/users
-// POST  /api/v1/users
-// PATCH /api/v1/users/:id/status
 // ======================================================
 
 router.use(
   "/users",
   userRoutes
+);
+
+
+// ======================================================
+// ACTIVE UNIT MASTER
+//
+// GET /api/v1/units
+//
+// Only authenticated users can access.
+// Only isActive = true units are returned.
+// ======================================================
+
+router.use(
+  "/units",
+  authenticateToken
+);
+
+router.use(
+  "/units",
+  unitRoutes
 );
 
 
