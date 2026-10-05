@@ -16,28 +16,8 @@ import {
   getYearlySummary,
 } from "./dashboard.controller.ts";
 
-
 const router =
   Router();
-
-
-// ======================================================
-// DASHBOARD ACCESS
-//
-// FULL ACCESS:
-// - SUPER_ADMIN
-// - MASTER_ADMIN
-// - ADMIN
-// - DIRECTOR
-// - HO_USER (legacy)
-//
-// RESTRICTED ACCESS:
-// - INCHARGE_DIRECTOR
-//
-// INCHARGE_DIRECTOR is allowed to call dashboard/report
-// APIs, but controller + service restrict every query to
-// the logged-in user's assigned unitId.
-// ======================================================
 
 const dashboardRoles = [
   "SUPER_ADMIN",
@@ -48,11 +28,6 @@ const dashboardRoles = [
   "HO_USER",
 ] as const;
 
-
-// ======================================================
-// AVAILABLE YEARS
-// ======================================================
-
 router.get(
   "/dashboard/years",
   requireRoles(
@@ -60,11 +35,6 @@ router.get(
   ),
   getDashboardYears
 );
-
-
-// ======================================================
-// DATE RANGE DASHBOARD
-// ======================================================
 
 router.get(
   "/dashboard-range",
@@ -74,11 +44,6 @@ router.get(
   getDashboardRangeReport
 );
 
-
-// ======================================================
-// EXACT DATE DASHBOARD
-// ======================================================
-
 router.get(
   "/dashboard",
   requireRoles(
@@ -86,11 +51,6 @@ router.get(
   ),
   getDashboard
 );
-
-
-// ======================================================
-// MONTHLY RAW HISTORY
-// ======================================================
 
 router.get(
   "/monthly",
@@ -100,11 +60,6 @@ router.get(
   getMonthly
 );
 
-
-// ======================================================
-// YEARLY RAW HISTORY
-// ======================================================
-
 router.get(
   "/yearly",
   requireRoles(
@@ -112,11 +67,6 @@ router.get(
   ),
   getYearly
 );
-
-
-// ======================================================
-// MONTHLY FINAL SUMMARY
-// ======================================================
 
 router.get(
   "/monthly-summary",
@@ -126,11 +76,6 @@ router.get(
   getMonthlySummary
 );
 
-
-// ======================================================
-// YEARLY 12-MONTH FINAL SUMMARY
-// ======================================================
-
 router.get(
   "/yearly-summary",
   requireRoles(
@@ -138,6 +83,5 @@ router.get(
   ),
   getYearlySummary
 );
-
 
 export default router;

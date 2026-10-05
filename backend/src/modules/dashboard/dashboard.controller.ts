@@ -21,26 +21,6 @@ import {
   getYearlyReports,
 } from "./dashboard.service.ts";
 
-
-// ======================================================
-// UNIT SCOPE
-//
-// FULL ACCESS ROLES:
-// - SUPER_ADMIN
-// - MASTER_ADMIN
-// - ADMIN
-// - DIRECTOR
-// - HO_USER
-//
-// These roles return undefined, so service functions
-// load all active units.
-//
-// INCHARGE_DIRECTOR:
-// Returns the logged-in user's assigned unitId.
-// Every dashboard/report service then filters to only
-// that unit.
-// ======================================================
-
 function getDashboardUnitScope(
   req: AuthenticatedRequest
 ): number | undefined {
@@ -84,11 +64,6 @@ function getDashboardUnitScope(
   return user.unitId;
 }
 
-
-// ======================================================
-// YEAR VALIDATION
-// ======================================================
-
 function getYear(
   value: unknown
 ): number {
@@ -111,11 +86,6 @@ function getYear(
   return year;
 }
 
-
-// ======================================================
-// MONTH VALIDATION
-// ======================================================
-
 function getMonth(
   value: unknown
 ): number {
@@ -137,11 +107,6 @@ function getMonth(
 
   return month;
 }
-
-
-// ======================================================
-// REQUIRED DATE VALIDATION
-// ======================================================
 
 function getRequiredDate(
   value: unknown,
@@ -169,17 +134,6 @@ function getRequiredDate(
     input
   );
 }
-
-
-// ======================================================
-// AVAILABLE YEARS
-//
-// GET:
-// /api/v1/revenue/dashboard/years
-//
-// INCHARGE_DIRECTOR:
-// Years are derived only from the assigned unit.
-// ======================================================
 
 export async function getDashboardYears(
   req: AuthenticatedRequest,
@@ -225,17 +179,6 @@ export async function getDashboardYears(
 
   }
 }
-
-
-// ======================================================
-// EXACT DATE DASHBOARD
-//
-// GET:
-// /api/v1/revenue/dashboard?date=2026-09-18
-//
-// INCHARGE_DIRECTOR:
-// Own assigned unit only.
-// ======================================================
 
 export async function getDashboard(
   req: AuthenticatedRequest,
@@ -289,19 +232,6 @@ export async function getDashboard(
 
   }
 }
-
-
-// ======================================================
-// DASHBOARD DATE RANGE
-//
-// GET:
-// /api/v1/revenue/dashboard-range
-// ?fromDate=2026-09-01
-// &toDate=2026-09-21
-//
-// INCHARGE_DIRECTOR:
-// Download/report data is own assigned unit only.
-// ======================================================
 
 export async function getDashboardRangeReport(
   req: AuthenticatedRequest,
@@ -383,17 +313,6 @@ export async function getDashboardRangeReport(
   }
 }
 
-
-// ======================================================
-// MONTHLY RAW HISTORY
-//
-// GET:
-// /api/v1/revenue/monthly?year=2026&month=9
-//
-// INCHARGE_DIRECTOR:
-// Own assigned unit only.
-// ======================================================
-
 export async function getMonthly(
   req: AuthenticatedRequest,
   res: Response
@@ -449,17 +368,6 @@ export async function getMonthly(
   }
 }
 
-
-// ======================================================
-// YEARLY RAW HISTORY
-//
-// GET:
-// /api/v1/revenue/yearly?year=2026
-//
-// INCHARGE_DIRECTOR:
-// Own assigned unit only.
-// ======================================================
-
 export async function getYearly(
   req: AuthenticatedRequest,
   res: Response
@@ -508,17 +416,6 @@ export async function getYearly(
 
   }
 }
-
-
-// ======================================================
-// MONTHLY FINAL SUMMARY
-//
-// GET:
-// /api/v1/revenue/monthly-summary?year=2026&month=9
-//
-// INCHARGE_DIRECTOR:
-// Latest date and summary are derived only from own unit.
-// ======================================================
 
 export async function getMonthlySummary(
   req: AuthenticatedRequest,
@@ -574,17 +471,6 @@ export async function getMonthlySummary(
 
   }
 }
-
-
-// ======================================================
-// YEARLY 12-MONTH FINAL SUMMARY
-//
-// GET:
-// /api/v1/revenue/yearly-summary?year=2026
-//
-// INCHARGE_DIRECTOR:
-// All 12 months are restricted to own assigned unit.
-// ======================================================
 
 export async function getYearlySummary(
   req: AuthenticatedRequest,

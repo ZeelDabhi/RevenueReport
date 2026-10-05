@@ -1,163 +1,27 @@
 import bcrypt from "bcryptjs";
-
-
-
 import type {
-
-
-
   Response,
-
-
-
 } from "express";
-
-
-
-
-
-
-
 import {
-
-
-
   prisma,
-
-
-
 } from "../../config/database.ts";
-
-
-
-
-
-
-
 import type {
-
-
-
   AppUserRole,
-
-
-
   AuthenticatedRequest,
-
-
-
 } from "../auth/auth.types.ts";
-
-
-
-
-
-
-
-
-
-
-
-// ======================================================
-
-
-
-// ROLES
-
-
-
-// ======================================================
-
-
-
-
-
-
-
 const FULL_MANAGEMENT_ROLES: AppUserRole[] = [
-
-
-
   "SUPER_ADMIN",
-
-
-
   "MASTER_ADMIN",
-
-
-
   "ADMIN",
-
-
-
   "DIRECTOR",
-
-
-
 ];
-
-
-
-
-
-
-
-
-
-
-
 const CREATABLE_ROLES: AppUserRole[] = [
-
-
-
   "SUPER_ADMIN",
-
-
-
   "MASTER_ADMIN",
-
-
-
   "ADMIN",
-
-
-
   "DIRECTOR",
-
-
-
   "INCHARGE_DIRECTOR",
-
-
-
 ];
-
-
-
-
-
-
-
-
-
-
-
-// ======================================================
-
-
-
-// COMMON USER SELECT
-
-
-
-// ======================================================
-
-
-
-
-
-
-
 const PUBLIC_USER_SELECT = {
 
 
@@ -10526,361 +10390,58 @@ export async function changeUserRole(
 
 
       "You do not have permission to manage users";
-
-
-
-
-
-
-
-
-
-
-
     return res
-
-
-
       .status(
-
-
-
         forbidden
-
-
-
           ? 403
-
-
-
           : 400
-
-
-
       )
-
-
-
       .json({
-
-
-
-
-
-
-
         success:
-
-
-
           false,
-
-
-
-
-
-
-
         message,
-
-
-
-
-
-
-
       });
-
-
-
-
-
-
-
   }
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-// ======================================================
-
-
-
-// DELETE USER
-
-
-
-//
-
-
-
-// FULL MANAGEMENT ONLY
-
-
-
-// ======================================================
-
-
-
-
-
-
-
 export async function deleteUser(
-
-
-
   req: AuthenticatedRequest,
-
-
-
   res: Response
-
-
-
 ) {
-
-
-
-
-
-
-
   try {
-
-
-
-
-
-
-
     const actor =
-
-
-
       ensureFullManagementAccess(
-
-
-
         req
-
-
-
       );
-
-
-
-
-
-
-
-
-
-
-
     const userId =
-
-
-
       getUserId(
-
-
-
         req.params.id
-
-
-
       );
-
-
-
-
-
-
-
-
-
-
-
     if (
-
-
-
       actor.userId ===
-
-
-
       userId
-
-
-
     ) {
-
-
-
-
-
-
-
       throw new Error(
-
-
-
         "You cannot delete your own account"
-
-
-
       );
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
     const target =
-
-
-
       await prisma.user.findUnique({
-
-
-
-
-
-
-
         where: {
-
-
-
-
-
-
-
           id:
-
-
-
             userId,
-
-
-
-
-
-
-
         },
-
-
-
-
-
-
-
-        select: {
-
-
-
-
-
-
-
+    select: {
           id:
-
-
-
             true,
-
-
-
-
-
-
-
           name:
-
-
-
             true,
-
-
-
-
-
-
-
           username:
-
-
-
             true,
-
-
-
-
-
-
-
           role:
-
-
-
             true,
-
-
-
-
-
-
-
           isActive:
-
-
-
             true,
-
-
-
-
-
-
-
         },
-
-
-
-
-
-
-
       });
 
 
@@ -11154,10 +10715,6 @@ export async function deleteUser(
 
 
         },
-
-
-
-
 
 
 

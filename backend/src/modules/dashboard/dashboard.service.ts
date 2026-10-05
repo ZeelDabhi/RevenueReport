@@ -2,11 +2,6 @@
   prisma,
 } from "../../config/database.ts";
 
-
-// ======================================================
-// MONTH NAMES
-// ======================================================
-
 export const MONTH_NAMES = [
   "January",
   "February",
@@ -22,11 +17,6 @@ export const MONTH_NAMES = [
   "December",
 ];
 
-
-// ======================================================
-// UNIT ORDER
-// ======================================================
-
 export const UNIT_ORDER = [
   "MB",
   "OS",
@@ -36,17 +26,6 @@ export const UNIT_ORDER = [
   "JN",
   "SM",
 ];
-
-
-// ======================================================
-// OPTIONAL UNIT SCOPE
-//
-// Full-access roles call service functions without unitId.
-// INCHARGE_DIRECTOR passes its assigned unitId.
-//
-// This helper keeps every dashboard query restricted to
-// the logged-in Incharge Director's own unit.
-// ======================================================
 
 function buildActiveUnitWhere(
   unitId?: number
@@ -62,11 +41,6 @@ function buildActiveUnitWhere(
       };
 }
 
-
-// ======================================================
-// ROUND 2 DECIMALS
-// ======================================================
-
 function round2(
   value: number
 ): number {
@@ -76,18 +50,12 @@ function round2(
   );
 }
 
-
-// ======================================================
-// FORMAT DATE
-// ======================================================
-
 function formatDate(
   date: Date
 ): string {
 
   const year =
     date.getUTCFullYear();
-
 
   const month =
     String(
@@ -97,7 +65,6 @@ function formatDate(
       "0"
     );
 
-
   const day =
     String(
       date.getUTCDate()
@@ -106,22 +73,8 @@ function formatDate(
       "0"
     );
 
-
   return `${year}-${month}-${day}`;
 }
-
-
-// ======================================================
-// NEXT DAY
-//
-// Revenue Dashboard rule:
-//
-// Dashboard Business Date = D
-// Current Bed Occupancy    = D + 1
-//
-// Example:
-// Dashboard 2026-09-22 uses Occupancy 2026-09-23.
-// ======================================================
 
 function getNextDay(
   date: Date
@@ -132,23 +85,12 @@ function getNextDay(
       date.getTime()
     );
 
-
   nextDay.setUTCDate(
     nextDay.getUTCDate() +
       1
   );
-
-
   return nextDay;
 }
-
-
-// ======================================================
-// PREVIOUS DAY
-//
-// Used when mapping an actual Occupancy date back to the
-// Revenue Dashboard business date it belongs to.
-// ======================================================
 
 function getPreviousDay(
   date: Date
@@ -159,20 +101,13 @@ function getPreviousDay(
       date.getTime()
     );
 
-
   previousDay.setUTCDate(
     previousDay.getUTCDate() -
       1
   );
 
-
   return previousDay;
 }
-
-
-// ======================================================
-// MONTH START
-// ======================================================
 
 function getMonthStart(
   year: number,
@@ -187,11 +122,6 @@ function getMonthStart(
     )
   );
 }
-
-
-// ======================================================
-// NEXT MONTH START
-// ======================================================
 
 function getNextMonthStart(
   year: number,
@@ -208,10 +138,6 @@ function getNextMonthStart(
 }
 
 
-// ======================================================
-// YEAR START
-// ======================================================
-
 function getYearStart(
   year: number
 ): Date {
@@ -225,11 +151,6 @@ function getYearStart(
   );
 }
 
-
-// ======================================================
-// NEXT YEAR START
-// ======================================================
-
 function getNextYearStart(
   year: number
 ): Date {
@@ -242,11 +163,6 @@ function getNextYearStart(
     )
   );
 }
-
-
-// ======================================================
-// SORT UNITS
-// ======================================================
 
 function sortUnits(
   units: any[]
@@ -267,31 +183,6 @@ function sortUnits(
   );
 }
 
-
-// ======================================================
-// BUILD DASHBOARD SNAPSHOT
-//
-// Used by:
-//
-// 1. Exact Date Dashboard
-// 2. Date Range Dashboard
-// 3. Monthly Final Summary
-// 4. Yearly Summary
-//
-// OCCUPANCY RULE:
-//
-// Dashboard Business Date = D
-// Current Occupancy        = D + 1
-//
-// FORMULAS:
-//
-// PROJ = MTD Ã· Selected Day Ã— Month Days
-//
-// GAP = PROJ - Unit TGT
-//
-// GRAND GAP = Grand PROJ - Group TGT
-// ======================================================
-
 function buildDashboardSnapshot(
   selectedDate: Date,
   unitsInput: any[],
@@ -306,16 +197,13 @@ function buildDashboardSnapshot(
     selectedDate
       .getUTCFullYear();
 
-
   const month =
     selectedDate
       .getUTCMonth() + 1;
 
-
   const selectedDay =
     selectedDate
       .getUTCDate();
-
 
   const totalDaysInMonth =
     new Date(
@@ -327,25 +215,16 @@ function buildDashboardSnapshot(
     )
       .getUTCDate();
 
-
   const units =
     sortUnits(
       unitsInput
     );
-
-
-  // ====================================================
-  // REVENUE MAP
-  //
-  // unitId-reportType
-  // ====================================================
 
   const revenueMap =
     new Map<
       string,
       any
     >();
-
 
   for (
     const report
@@ -359,17 +238,11 @@ function buildDashboardSnapshot(
 
   }
 
-
-  // ====================================================
-  // TARGET MAP
-  // ====================================================
-
   const targetMap =
     new Map<
       number,
       any
     >();
-
 
   for (
     const target
@@ -383,17 +256,11 @@ function buildDashboardSnapshot(
 
   }
 
-
-  // ====================================================
-  // OCCUPANCY MAP
-  // ====================================================
-
   const occupancyMap =
     new Map<
       number,
       any
     >();
-
 
   for (
     const occupancy
@@ -407,11 +274,6 @@ function buildDashboardSnapshot(
 
   }
 
-
-  // ====================================================
-  // UNIT TABLE
-  // ====================================================
-
   const unitDashboard =
     units.map(
       (unit) => {
@@ -421,34 +283,25 @@ function buildDashboardSnapshot(
             `${unit.id}-FTD`
           );
 
-
         const MTD =
           revenueMap.get(
             `${unit.id}-MTD`
           );
-
 
         const LMTD =
           revenueMap.get(
             `${unit.id}-LMTD`
           );
 
-
         const target =
           targetMap.get(
             unit.id
           );
 
-
         const occupancy =
           occupancyMap.get(
             unit.id
           );
-
-
-        // ===============================================
-        // VALUES
-        // ===============================================
 
         const ftdLakhs =
           FTD
@@ -457,14 +310,12 @@ function buildDashboardSnapshot(
               )
             : 0;
 
-
         const mtdLakhs =
           MTD
             ? Number(
                 MTD.totalNetAmountLakhs
               )
             : 0;
-
 
         const lmtdLakhs =
           LMTD
@@ -473,14 +324,12 @@ function buildDashboardSnapshot(
               )
             : 0;
 
-
         const targetLakhs =
           target
             ? Number(
                 target.targetLakhs
               )
             : 0;
-
 
         const currentOccupancy =
           occupancy
@@ -489,11 +338,6 @@ function buildDashboardSnapshot(
               )
             : 0;
 
-
-        // ===============================================
-        // PROJECTION
-        // ===============================================
-
         const projectionLakhs =
           (
             mtdLakhs /
@@ -501,15 +345,9 @@ function buildDashboardSnapshot(
           ) *
           totalDaysInMonth;
 
-
-        // ===============================================
-        // GAP
-        // ===============================================
-
         const gapLakhs =
           projectionLakhs -
           targetLakhs;
-
 
         return {
 
@@ -522,15 +360,9 @@ function buildDashboardSnapshot(
           unitName:
             unit.name,
 
-
-          // =============================================
-          // FTD
-          // =============================================
-
           FTD:
             FTD
               ? {
-
                   importId:
                     FTD.id,
 
@@ -564,11 +396,6 @@ function buildDashboardSnapshot(
 
                 }
               : null,
-
-
-          // =============================================
-          // MTD
-          // =============================================
 
           MTD:
             MTD
@@ -608,11 +435,6 @@ function buildDashboardSnapshot(
                 }
               : null,
 
-
-          // =============================================
-          // LMTD
-          // =============================================
-
           LMTD:
             LMTD
               ? {
@@ -651,11 +473,6 @@ function buildDashboardSnapshot(
                 }
               : null,
 
-
-          // =============================================
-          // TARGET
-          // =============================================
-
           TGT: {
 
             valueLakhs:
@@ -669,11 +486,6 @@ function buildDashboardSnapshot(
               ),
 
           },
-
-
-          // =============================================
-          // PROJECTION
-          // =============================================
 
           PROJ: {
 
@@ -690,11 +502,6 @@ function buildDashboardSnapshot(
               "MTD / Selected Day * Total Days In Month",
 
           },
-
-
-          // =============================================
-          // CURRENT OCCUPANCY
-          // =============================================
 
           CURR_OCC: {
 
@@ -723,11 +530,6 @@ function buildDashboardSnapshot(
 
           },
 
-
-          // =============================================
-          // GAP
-          // =============================================
-
           GAP: {
 
             valueLakhs:
@@ -745,11 +547,6 @@ function buildDashboardSnapshot(
       }
     );
 
-
-  // ====================================================
-  // GRAND TOTALS
-  // ====================================================
-
   const grandFTD =
     unitDashboard.reduce(
       (
@@ -763,7 +560,6 @@ function buildDashboardSnapshot(
         ),
       0
     );
-
 
   const grandMTD =
     unitDashboard.reduce(
@@ -779,7 +575,6 @@ function buildDashboardSnapshot(
       0
     );
 
-
   const grandLMTD =
     unitDashboard.reduce(
       (
@@ -794,7 +589,6 @@ function buildDashboardSnapshot(
       0
     );
 
-
   const grandPROJ =
     unitDashboard.reduce(
       (
@@ -805,7 +599,6 @@ function buildDashboardSnapshot(
         unit.PROJ.valueLakhs,
       0
     );
-
 
   const grandCurrentOccupancy =
     unitDashboard.reduce(
@@ -818,7 +611,6 @@ function buildDashboardSnapshot(
       0
     );
 
-
   const unitTargetSum =
     unitDashboard.reduce(
       (
@@ -830,11 +622,6 @@ function buildDashboardSnapshot(
       0
     );
 
-
-  // ====================================================
-  // MANUAL GROUP TARGET
-  // ====================================================
-
   const grandTarget =
     unitId
       ? unitTargetSum
@@ -844,19 +631,9 @@ function buildDashboardSnapshot(
           )
         : 0;
 
-
-  // ====================================================
-  // GRAND GAP
-  // ====================================================
-
   const grandGAP =
     grandPROJ -
     grandTarget;
-
-
-  // ====================================================
-  // DATA STATUS
-  // ====================================================
 
   const revenueCompleteUnits =
     unitDashboard.filter(
@@ -869,14 +646,12 @@ function buildDashboardSnapshot(
     )
       .length;
 
-
   const occupancyCompleteUnits =
     unitDashboard.filter(
       (unit) =>
         unit.CURR_OCC.available
     )
       .length;
-
 
   return {
 
@@ -901,7 +676,6 @@ function buildDashboardSnapshot(
 
     },
 
-
     projectionInfo: {
 
       selectedDay,
@@ -912,7 +686,6 @@ function buildDashboardSnapshot(
         "MTD / Selected Day * Total Days In Month",
 
     },
-
 
     gapInfo: {
 
@@ -925,7 +698,6 @@ function buildDashboardSnapshot(
           : "Grand PROJ - Group TGT",
 
     },
-
 
     dataStatus: {
 
@@ -945,7 +717,6 @@ function buildDashboardSnapshot(
         units.length,
 
     },
-
 
     grandTotal: {
 
@@ -999,20 +770,11 @@ function buildDashboardSnapshot(
 
     },
 
-
     units:
       unitDashboard,
 
   };
 }
-
-
-// ======================================================
-// AVAILABLE YEARS
-//
-// Optimized:
-// Revenue / Occupancy only distinct dates.
-// ======================================================
 
 export async function getAvailableYears(
   unitId?: number
@@ -1045,7 +807,6 @@ export async function getAvailableYears(
 
       }),
 
-
       prisma.revenueTarget.findMany({
 
         where: {
@@ -1065,7 +826,6 @@ export async function getAvailableYears(
 
       }),
 
-
       unitId
         ? Promise.resolve([])
         : prisma.groupRevenueTarget.findMany({
@@ -1080,7 +840,6 @@ export async function getAvailableYears(
             ],
 
           }),
-
 
       prisma.dailyOccupancy.findMany({
 
@@ -1103,10 +862,8 @@ export async function getAvailableYears(
 
     ]);
 
-
   const years =
     new Set<number>();
-
 
   for (
     const record
@@ -1132,7 +889,6 @@ export async function getAvailableYears(
 
   }
 
-
   for (
     const record
     of groupTargetYears
@@ -1143,7 +899,6 @@ export async function getAvailableYears(
     );
 
   }
-
 
   for (
     const record
@@ -1174,16 +929,6 @@ export async function getAvailableYears(
     );
 }
 
-
-// ======================================================
-// EXACT DATE DASHBOARD
-//
-// GET:
-// dashboard?date=2026-09-18
-//
-// 5 independent queries run parallel.
-// ======================================================
-
 export async function getRevenueDashboard(
   selectedDate: Date,
   unitId?: number
@@ -1198,18 +943,10 @@ export async function getRevenueDashboard(
     selectedDate
       .getUTCMonth() + 1;
 
-
-  // ====================================================
-  // OCCUPANCY DATE MAPPING
-  //
-  // Dashboard 22/09 -> Occupancy 23/09
-  // ====================================================
-
   const occupancyDate =
     getNextDay(
       selectedDate
     );
-
 
   const [
     units,
@@ -1219,7 +956,6 @@ export async function getRevenueDashboard(
     occupancyRecords,
   ] =
     await Promise.all([
-
 
       prisma.unit.findMany({
 
@@ -1239,7 +975,6 @@ export async function getRevenueDashboard(
         },
 
       }),
-
 
       prisma.revenueImport.findMany({
 
@@ -1291,7 +1026,6 @@ export async function getRevenueDashboard(
 
       }),
 
-
       prisma.revenueTarget.findMany({
 
         where: {
@@ -1316,7 +1050,6 @@ export async function getRevenueDashboard(
 
       }),
 
-
       unitId
         ? Promise.resolve(null)
         : prisma.groupRevenueTarget.findUnique({
@@ -1338,7 +1071,6 @@ export async function getRevenueDashboard(
             },
 
           }),
-
 
       prisma.dailyOccupancy.findMany({
 
@@ -1376,7 +1108,6 @@ export async function getRevenueDashboard(
 
     ]);
 
-
   return buildDashboardSnapshot(
     selectedDate,
     units,
@@ -1387,27 +1118,6 @@ export async function getRevenueDashboard(
     unitId
   );
 }
-
-
-// ======================================================
-// DASHBOARD DATE RANGE
-//
-// GET:
-// dashboard-range?fromDate=2026-09-01&toDate=2026-09-21
-//
-// Purpose:
-//
-// 1. One optimized API call for Daily Range download.
-// 2. Month download can use month start/end.
-// 3. Year download can use Jan 1 / Dec 31.
-// 4. Avoids calling exact-date dashboard API hundreds of times.
-//
-// Only dates having Revenue and/or mapped next-day
-// Occupancy data are returned. Targets are attached
-// month-wise.
-//
-// Maximum supported range = 366 calendar days.
-// ======================================================
 
 export async function getDashboardRange(
   startDate: Date,
@@ -1426,13 +1136,11 @@ export async function getDashboardRange(
 
   }
 
-
   const millisecondsPerDay =
     24 *
     60 *
     60 *
     1000;
-
 
   const totalCalendarDays =
     Math.floor(
@@ -1442,7 +1150,6 @@ export async function getDashboardRange(
       ) /
       millisecondsPerDay
     ) + 1;
-
 
   if (
     totalCalendarDays >
@@ -1455,45 +1162,28 @@ export async function getDashboardRange(
 
   }
 
-
   const endExclusive =
     new Date(
       endDate.getTime()
     );
-
 
   endExclusive.setUTCDate(
     endExclusive.getUTCDate() +
       1
   );
 
-
-  // ====================================================
-  // OCCUPANCY RANGE MAPPING
-  //
-  // Dashboard range D1..D2 must read Occupancy
-  // (D1 + 1)..(D2 + 1).
-  // ====================================================
-
   const occupancyStartDate =
     getNextDay(
       startDate
     );
-
 
   const occupancyEndExclusive =
     getNextDay(
       endExclusive
     );
 
-
-  // ====================================================
-  // YEARS REQUIRED FOR TARGET LOOKUP
-  // ====================================================
-
   const years =
     new Set<number>();
-
 
   for (
     let year =
@@ -1501,7 +1191,8 @@ export async function getDashboardRange(
     year <=
       endDate.getUTCFullYear();
     year++
-  ) {
+  ) 
+  {
 
     years.add(
       year
@@ -1509,18 +1200,10 @@ export async function getDashboardRange(
 
   }
 
-
   const yearList =
     Array.from(
       years
     );
-
-
-  // ====================================================
-  // OPTIMIZED RANGE QUERIES
-  //
-  // All independent queries run in parallel.
-  // ====================================================
 
   const [
     units,
@@ -1530,7 +1213,6 @@ export async function getDashboardRange(
     groupTargets,
   ] =
     await Promise.all([
-
 
       prisma.unit.findMany({
 
@@ -1551,59 +1233,38 @@ export async function getDashboardRange(
 
       }),
 
-
       prisma.revenueImport.findMany({
-
         where: {
-
           businessDate: {
-
             gte:
               startDate,
-
             lt:
               endExclusive,
-
           },
-
           status:
             "COMPLETED",
-
           unit: buildActiveUnitWhere(unitId),
-
         },
-
         select: {
-
           id:
             true,
-
           unitId:
             true,
-
           reportType:
             true,
-
           businessDate:
             true,
-
           fromDate:
             true,
-
           toDate:
             true,
-
           fileName:
             true,
-
           totalNetAmount:
             true,
-
           totalNetAmountLakhs:
             true,
-
         },
-
         orderBy: [
           {
             businessDate:
@@ -1620,45 +1281,29 @@ export async function getDashboardRange(
         ],
 
       }),
-
-
       prisma.dailyOccupancy.findMany({
-
         where: {
-
-          occupancyDate: {
-
+         occupancyDate: {
             gte:
               occupancyStartDate,
-
             lt:
               occupancyEndExclusive,
-
           },
-
           unit: buildActiveUnitWhere(unitId),
 
         },
-
         select: {
-
           id:
             true,
-
           unitId:
             true,
-
           occupancyDate:
             true,
-
           occupancyCount:
             true,
-
           sourceFileName:
             true,
-
         },
-
         orderBy: [
           {
             occupancyDate:
@@ -1671,85 +1316,56 @@ export async function getDashboardRange(
         ],
 
       }),
-
-
       prisma.revenueTarget.findMany({
-
         where: {
-
           year: {
             in:
               yearList,
           },
-
           unit: buildActiveUnitWhere(unitId),
 
         },
-
         select: {
-
           unitId:
             true,
-
           year:
             true,
-
           month:
             true,
-
           targetLakhs:
             true,
-
         },
-
       }),
 
 
       unitId
         ? Promise.resolve([])
         : prisma.groupRevenueTarget.findMany({
-
             where: {
-
               year: {
                 in:
                   yearList,
               },
 
             },
-
             select: {
-
               year:
                 true,
-
               month:
                 true,
-
               groupTargetLakhs:
                 true,
-
             },
-
           }),
-
     ]);
-
-
-  // ====================================================
-  // GROUP REPORTS BY DATE
-  // ====================================================
-
   const reportsByDate =
     new Map<
       string,
       any[]
     >();
 
-
   const availableDates =
     new Set<string>();
-
 
   for (
     const report
@@ -1761,11 +1377,9 @@ export async function getDashboardRange(
         report.businessDate
       );
 
-
     availableDates.add(
       dateKey
     );
-
 
     if (
       !reportsByDate.has(
@@ -1779,8 +1393,6 @@ export async function getDashboardRange(
       );
 
     }
-
-
     reportsByDate
       .get(
         dateKey
@@ -1791,17 +1403,11 @@ export async function getDashboardRange(
 
   }
 
-
-  // ====================================================
-  // GROUP OCCUPANCY BY DATE
-  // ====================================================
-
   const occupancyByDate =
     new Map<
       string,
       any[]
     >();
-
 
   for (
     const occupancy
@@ -1813,17 +1419,14 @@ export async function getDashboardRange(
         occupancy.occupancyDate
       );
 
-
     const dateKey =
       formatDate(
         dashboardDate
       );
 
-
     availableDates.add(
       dateKey
     );
-
 
     if (
       !occupancyByDate.has(
@@ -1835,9 +1438,7 @@ export async function getDashboardRange(
         dateKey,
         []
       );
-
     }
-
 
     occupancyByDate
       .get(
@@ -1849,17 +1450,11 @@ export async function getDashboardRange(
 
   }
 
-
-  // ====================================================
-  // GROUP UNIT TARGETS BY YEAR-MONTH
-  // ====================================================
-
   const targetsByMonth =
     new Map<
       string,
       any[]
     >();
-
 
   for (
     const target
@@ -1883,7 +1478,6 @@ export async function getDashboardRange(
 
     }
 
-
     targetsByMonth
       .get(
         monthKey
@@ -1894,34 +1488,22 @@ export async function getDashboardRange(
 
   }
 
-
-  // ====================================================
-  // GROUP TARGET MAP
-  // ====================================================
-
   const groupTargetByMonth =
     new Map<
       string,
       any
     >();
 
-
   for (
     const target
     of groupTargets
-  ) {
-
+  )
+   {
     groupTargetByMonth.set(
       `${target.year}-${target.month}`,
       target
     );
-
   }
-
-
-  // ====================================================
-  // BUILD SNAPSHOT FOR EVERY AVAILABLE DATE
-  // ====================================================
 
   const sortedAvailableDates =
     Array
@@ -1929,7 +1511,6 @@ export async function getDashboardRange(
         availableDates
       )
       .sort();
-
 
   const days =
     sortedAvailableDates.map(
@@ -1945,8 +1526,6 @@ export async function getDashboardRange(
           dateKey.split(
             "-"
           );
-
-
         const date =
           new Date(
             Date.UTC(
@@ -1962,11 +1541,8 @@ export async function getDashboardRange(
             )
           );
 
-
         const monthKey =
           `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`;
-
-
         const snapshot =
           buildDashboardSnapshot(
             date,
@@ -1986,28 +1562,17 @@ export async function getDashboardRange(
             unitId
           );
 
-
         return {
 
           date:
             dateKey,
 
           ...snapshot,
-
         };
-
       }
     );
-
-
-  // ====================================================
-  // RETURN RANGE DATA
-  // ====================================================
-
   return {
-
     filters: {
-
       fromDate:
         formatDate(
           startDate
@@ -2025,26 +1590,12 @@ export async function getDashboardRange(
 
     },
 
-
     availableDates:
       sortedAvailableDates,
-
-
     days,
 
   };
 }
-
-
-// ======================================================
-// MONTHLY RAW HISTORY
-//
-// Existing API retained.
-//
-// GET:
-// monthly?year=2026&month=9
-// ======================================================
-
 export async function getMonthlyReports(
   year: number,
   month: number,
@@ -2057,35 +1608,24 @@ export async function getMonthlyReports(
       month
     );
 
-
   const endDate =
     getNextMonthStart(
       year,
       month
     );
 
-
   const reports =
     await prisma.revenueImport.findMany({
-
       where: {
-
         businessDate: {
-
           gte:
             startDate,
-
           lt:
             endDate,
-
         },
-
         unit: buildActiveUnitWhere(unitId),
-
       },
-
       select: {
-
         id:
           true,
 
@@ -2125,13 +1665,9 @@ export async function getMonthlyReports(
 
             name:
               true,
-
           },
-
         },
-
       },
-
       orderBy: [
 
         {
@@ -2148,11 +1684,8 @@ export async function getMonthlyReports(
           reportType:
             "asc",
         },
-
       ],
-
     });
-
 
   const unitMap =
     new Map<
@@ -2163,7 +1696,6 @@ export async function getMonthlyReports(
         reports: any[];
       }
     >();
-
 
   for (
     const report
@@ -2179,7 +1711,6 @@ export async function getMonthlyReports(
       unitMap.set(
         report.unit.code,
         {
-
           unitCode:
             report.unit.code,
 
@@ -2188,12 +1719,9 @@ export async function getMonthlyReports(
 
           reports:
             [],
-
         }
       );
-
     }
-
 
     unitMap
       .get(
@@ -2232,12 +1760,8 @@ export async function getMonthlyReports(
 
         status:
           report.status,
-
       });
-
   }
-
-
   const availableDates =
     Array
       .from(
@@ -2251,31 +1775,22 @@ export async function getMonthlyReports(
         )
       )
       .sort();
-
-
   return {
-
     year,
-
     month,
-
     monthName:
       MONTH_NAMES[
         month - 1
       ],
-
     totalFiles:
       reports.length,
-
     availableDates,
-
     latestAvailableDate:
       availableDates.length > 0
         ? availableDates[
             availableDates.length - 1
           ]
         : null,
-
     units:
       Array
         .from(
@@ -2292,20 +1807,8 @@ export async function getMonthlyReports(
               b.unitCode
             )
         ),
-
   };
 }
-
-
-// ======================================================
-// YEARLY RAW HISTORY
-//
-// Existing API retained.
-//
-// GET:
-// yearly?year=2026
-// ======================================================
-
 export async function getYearlyReports(
   year: number,
   unitId?: number
@@ -2316,30 +1819,22 @@ export async function getYearlyReports(
       year
     );
 
-
   const endDate =
     getNextYearStart(
       year
     );
 
-
   const reports =
     await prisma.revenueImport.findMany({
-
       where: {
-
         businessDate: {
-
           gte:
             startDate,
-
           lt:
             endDate,
-
         },
 
         unit: buildActiveUnitWhere(unitId),
-
       },
 
       select: {
@@ -2383,20 +1878,14 @@ export async function getYearlyReports(
 
             name:
               true,
-
           },
-
         },
-
       },
-
       orderBy: {
         businessDate:
           "asc",
       },
-
     });
-
 
   const months =
     MONTH_NAMES.map(
@@ -2425,7 +1914,6 @@ export async function getYearlyReports(
       })
     );
 
-
   for (
     let monthIndex = 0;
     monthIndex < 12;
@@ -2441,7 +1929,6 @@ export async function getYearlyReports(
           monthIndex
       );
 
-
     const availableDates =
       Array
         .from(
@@ -2456,7 +1943,6 @@ export async function getYearlyReports(
         )
         .sort();
 
-
     const unitMap =
       new Map<
         string,
@@ -2466,7 +1952,6 @@ export async function getYearlyReports(
           reports: any[];
         }
       >();
-
 
     for (
       const report
@@ -2482,22 +1967,15 @@ export async function getYearlyReports(
         unitMap.set(
           report.unit.code,
           {
-
             unitCode:
               report.unit.code,
-
             unitName:
               report.unit.name,
-
             reports:
-              [],
-
+             [],
           }
         );
-
       }
-
-
       unitMap
         .get(
           report.unit.code
@@ -2534,18 +2012,13 @@ export async function getYearlyReports(
             ),
 
           status:
-            report.status,
-
-        });
-
+          report.status,
+       });
     }
-
-
     months[
       monthIndex
     ].totalFiles =
       monthReports.length;
-
 
     months[
       monthIndex
@@ -2581,37 +2054,14 @@ export async function getYearlyReports(
               b.unitCode
             )
         );
-
   }
-
-
   return {
-
     year,
-
     totalFiles:
       reports.length,
-
     months,
-
   };
 }
-
-
-// ======================================================
-// MONTHLY FINAL SUMMARY
-//
-// Example:
-// August 2026
-//
-// Finds latest stored Revenue Date.
-//
-// If latest date = 31-08-2026:
-//
-// Final dashboard is built for 31-08-2026.
-//
-// No manual date selection required.
-// ======================================================
 
 export async function getMonthlyFinalSummary(
   year: number,
@@ -2625,62 +2075,35 @@ export async function getMonthlyFinalSummary(
       month
     );
 
-
   const endDate =
     getNextMonthStart(
       year,
       month
     );
 
-
-  // ====================================================
-  // FIND LATEST AVAILABLE REVENUE DATE
-  //
-  // Uses indexed businessDate.
-  // ====================================================
-
   const latestRevenue =
     await prisma.revenueImport.findFirst({
-
       where: {
-
         businessDate: {
-
           gte:
             startDate,
-
           lt:
             endDate,
-
         },
-
         status:
           "COMPLETED",
-
-        unit: buildActiveUnitWhere(unitId),
-
+      unit: buildActiveUnitWhere(unitId),
       },
-
       orderBy: {
-
         businessDate:
           "desc",
-
       },
-
       select: {
-
         businessDate:
           true,
-
       },
-
     });
 
-
-  // ====================================================
-  // NO REVENUE DATA IN MONTH
-  // ====================================================
 
   if (
     !latestRevenue
@@ -2707,68 +2130,42 @@ export async function getMonthlyFinalSummary(
 
             name:
               true,
-
           },
-
         }),
-
-
         prisma.revenueTarget.findMany({
-
           where: {
-
             year,
-
             month,
-
             unit: buildActiveUnitWhere(unitId),
-
           },
-
           select: {
-
             unitId:
               true,
-
             targetLakhs:
               true,
-
           },
-
         }),
-
-
         unitId
           ? Promise.resolve(null)
           : prisma.groupRevenueTarget.findUnique({
-
               where: {
-
                 year_month: {
                   year,
                   month,
                 },
-
               },
-
               select: {
-
                 groupTargetLakhs:
                   true,
-
               },
-
             }),
-
       ]);
-
 
     const targetMap =
       new Map<
         number,
         any
       >();
-
 
     for (
       const target
@@ -2781,13 +2178,10 @@ export async function getMonthlyFinalSummary(
       );
 
     }
-
-
     const sortedUnits =
       sortUnits(
         units
       );
-
 
     const unitRows =
       sortedUnits.map(
@@ -2797,18 +2191,13 @@ export async function getMonthlyFinalSummary(
             targetMap.get(
               unit.id
             );
-
-
           const targetLakhs =
             target
               ? Number(
                   target.targetLakhs
                 )
               : 0;
-
-
           return {
-
             unitId:
               unit.id,
 
@@ -2817,63 +2206,42 @@ export async function getMonthlyFinalSummary(
 
             unitName:
               unit.name,
-
             FTD:
               null,
-
             MTD:
               null,
-
             LMTD:
               null,
-
             TGT: {
-
               valueLakhs:
                 round2(
                   targetLakhs
                 ),
-
               available:
                 Boolean(
                   target
                 ),
-
             },
-
             PROJ: {
-
               valueLakhs:
                 0,
-
             },
-
             CURR_OCC: {
-
               value:
                 0,
-
               available:
                 false,
-
             },
-
             GAP: {
-
-              valueLakhs:
+             valueLakhs:
                 round2(
                   0 -
                   targetLakhs
                 ),
-
             },
-
           };
-
         }
       );
-
-
     const unitTargetSum =
       unitRows.reduce(
         (
@@ -2885,7 +2253,6 @@ export async function getMonthlyFinalSummary(
         0
       );
 
-
     const grandTarget =
       unitId
         ? unitTargetSum
@@ -2894,20 +2261,14 @@ export async function getMonthlyFinalSummary(
               groupTarget.groupTargetLakhs
             )
           : 0;
-
-
     return {
-
       summaryType:
         "MONTHLY_FINAL",
 
       hasData:
         false,
-
       year,
-
       month,
-
       monthName:
         MONTH_NAMES[
           month - 1
@@ -2967,31 +2328,18 @@ export async function getMonthlyFinalSummary(
     };
 
   }
-
-
-  // ====================================================
-  // BUILD FINAL DASHBOARD USING LATEST DATE
-  // ====================================================
-
   const dashboard =
     await getRevenueDashboard(
       latestRevenue.businessDate,
       unitId
     );
-
-
   return {
-
     summaryType:
       "MONTHLY_FINAL",
-
     hasData:
       true,
-
     year,
-
     month,
-
     monthName:
       MONTH_NAMES[
         month - 1
@@ -3007,24 +2355,6 @@ export async function getMonthlyFinalSummary(
   };
 }
 
-
-// ======================================================
-// YEARLY 12-MONTH FINAL SUMMARY
-//
-// Performance:
-//
-// Step 1:
-// Load only distinct available dates.
-//
-// Step 2:
-// Pick latest date of each month.
-//
-// Step 3:
-// Load revenue only for those max 12 dates.
-//
-// This avoids loading full daily revenue rows.
-// ======================================================
-
 export async function getYearlyFinalSummary(
   year: number,
   unitId?: number
@@ -3035,16 +2365,10 @@ export async function getYearlyFinalSummary(
       year
     );
 
-
   const endDate =
     getNextYearStart(
       year
     );
-
-
-  // ====================================================
-  // INITIAL LIGHTWEIGHT QUERIES
-  // ====================================================
 
   const [
     units,
@@ -3053,7 +2377,6 @@ export async function getYearlyFinalSummary(
     yearGroupTargets,
   ] =
     await Promise.all([
-
 
       prisma.unit.findMany({
 
@@ -3069,15 +2392,8 @@ export async function getYearlyFinalSummary(
 
           name:
             true,
-
         },
-
       }),
-
-
-      // ===============================================
-      // DISTINCT DAILY DATES ONLY
-      // ===============================================
 
       prisma.revenueImport.findMany({
 
@@ -3119,42 +2435,20 @@ export async function getYearlyFinalSummary(
         },
 
       }),
-
-
-      // ===============================================
-      // FULL YEAR UNIT TARGETS
-      // ===============================================
-
       prisma.revenueTarget.findMany({
-
         where: {
-
           year,
-
           unit: buildActiveUnitWhere(unitId),
-
         },
-
         select: {
-
           unitId:
             true,
-
           month:
             true,
-
           targetLakhs:
             true,
-
         },
-
       }),
-
-
-      // ===============================================
-      // FULL YEAR GROUP TARGETS
-      // ===============================================
-
       unitId
         ? Promise.resolve([])
         : prisma.groupRevenueTarget.findMany({
@@ -3177,17 +2471,11 @@ export async function getYearlyFinalSummary(
 
     ]);
 
-
-  // ====================================================
-  // FIND LATEST DATE FOR EACH MONTH
-  // ====================================================
-
   const latestDateByMonth =
     new Map<
       number,
       Date
     >();
-
 
   for (
     const record
@@ -3198,7 +2486,6 @@ export async function getYearlyFinalSummary(
       record.businessDate
         .getUTCMonth() + 1;
 
-
     latestDateByMonth.set(
       month,
       record.businessDate
@@ -3206,13 +2493,11 @@ export async function getYearlyFinalSummary(
 
   }
 
-
   const selectedDates =
     Array
       .from(
         latestDateByMonth.values()
       );
-
 
   const selectedOccupancyDates =
     selectedDates.map(
@@ -3224,14 +2509,6 @@ export async function getYearlyFinalSummary(
         )
     );
 
-
-  // ====================================================
-  // LOAD ONLY FINAL DATES
-  //
-  // Maximum:
-  // 12 dates Ã— 7 units Ã— 3 reports
-  // ====================================================
-
   const [
     finalRevenueReports,
     finalOccupancyRecords,
@@ -3239,7 +2516,6 @@ export async function getYearlyFinalSummary(
     selectedDates.length > 0
 
       ? await Promise.all([
-
 
           prisma.revenueImport.findMany({
 
@@ -3287,14 +2563,11 @@ export async function getYearlyFinalSummary(
 
               totalNetAmountLakhs:
                 true,
-
             },
-
           }),
 
-
           prisma.dailyOccupancy.findMany({
-
+          
             where: {
 
               occupancyDate: {
@@ -3324,29 +2597,19 @@ export async function getYearlyFinalSummary(
 
               sourceFileName:
                 true,
-
             },
-
           }),
-
         ])
-
       : [
           [],
           [],
         ];
-
-
-  // ====================================================
-  // GROUP REVENUE BY DATE
-  // ====================================================
 
   const revenueByDate =
     new Map<
       string,
       any[]
     >();
-
 
   for (
     const report
@@ -3371,8 +2634,6 @@ export async function getYearlyFinalSummary(
       );
 
     }
-
-
     revenueByDate
       .get(
         key
@@ -3382,11 +2643,6 @@ export async function getYearlyFinalSummary(
       );
 
   }
-
-
-  // ====================================================
-  // GROUP OCCUPANCY BY DATE
-  // ====================================================
 
   const occupancyByDate =
     new Map<
@@ -3405,12 +2661,10 @@ export async function getYearlyFinalSummary(
         occupancy.occupancyDate
       );
 
-
     const key =
       formatDate(
         dashboardDate
       );
-
 
     if (
       !occupancyByDate.has(
@@ -3424,8 +2678,6 @@ export async function getYearlyFinalSummary(
       );
 
     }
-
-
     occupancyByDate
       .get(
         key
@@ -3435,15 +2687,8 @@ export async function getYearlyFinalSummary(
       );
 
   }
-
-
-  // ====================================================
-  // BUILD ALL 12 MONTHS
-  // ====================================================
-
   const months =
     [];
-
 
   for (
     let month = 1;
@@ -3456,7 +2701,6 @@ export async function getYearlyFinalSummary(
         month
       );
 
-
     const monthTargets =
       yearTargets.filter(
         (target) =>
@@ -3464,18 +2708,12 @@ export async function getYearlyFinalSummary(
           month
       );
 
-
     const groupTarget =
       yearGroupTargets.find(
         (target) =>
           target.month ===
           month
       );
-
-
-    // ==================================================
-    // NO REVENUE DATA
-    // ==================================================
 
     if (
       !latestDate
@@ -3487,7 +2725,6 @@ export async function getYearlyFinalSummary(
           any
         >();
 
-
       for (
         const target
         of monthTargets
@@ -3497,9 +2734,7 @@ export async function getYearlyFinalSummary(
           target.unitId,
           target
         );
-
       }
-
 
       const compactUnits =
         sortUnits(
@@ -3512,59 +2747,41 @@ export async function getYearlyFinalSummary(
                 targetMap.get(
                   unit.id
                 );
-
-
               const targetLakhs =
                 target
                   ? Number(
                       target.targetLakhs
                     )
                   : 0;
-
-
               return {
-
                 unitId:
                   unit.id,
-
                 unitCode:
                   unit.code,
-
                 unitName:
                   unit.name,
-
                 FTD:
                   0,
-
                 MTD:
                   0,
-
                 LMTD:
                   0,
-
                 TGT:
                   round2(
                     targetLakhs
                   ),
-
                 PROJ:
                   0,
-
                 CURR_OCC:
                   0,
-
                 GAP:
                   round2(
                     0 -
                     targetLakhs
                   ),
-
               };
-
             }
           );
-
-
       const unitTargetSum =
         compactUnits.reduce(
           (
@@ -3575,8 +2792,6 @@ export async function getYearlyFinalSummary(
             unit.TGT,
           0
         );
-
-
       const grandTarget =
         unitId
           ? unitTargetSum
@@ -3585,23 +2800,16 @@ export async function getYearlyFinalSummary(
                 groupTarget.groupTargetLakhs
               )
             : 0;
-
-
       months.push({
-
         month,
-
         monthName:
           MONTH_NAMES[
             month - 1
           ],
-
         hasData:
           false,
-
         asOfDate:
           null,
-
         grandTotal: {
 
           FTD:
@@ -3634,44 +2842,27 @@ export async function getYearlyFinalSummary(
               0 -
               grandTarget
             ),
-
         },
-
         units:
           compactUnits,
-
       });
-
-
       continue;
-
     }
-
-
-    // ==================================================
-    // MONTH HAS DATA
-    // ==================================================
-
     const dateKey =
       formatDate(
         latestDate
       );
-
-
     const reports =
       revenueByDate.get(
         dateKey
       ) ??
       [];
 
-
     const occupancy =
       occupancyByDate.get(
         dateKey
       ) ??
       [];
-
-
     const snapshot =
       buildDashboardSnapshot(
         latestDate,
@@ -3682,12 +2873,6 @@ export async function getYearlyFinalSummary(
         occupancy,
         unitId
       );
-
-
-    // ==================================================
-    // YEARLY RESPONSE STAYS COMPACT
-    // ==================================================
-
     const compactUnits =
       snapshot.units.map(
         (unit) => ({
@@ -3731,13 +2916,10 @@ export async function getYearlyFinalSummary(
           GAP:
             unit.GAP
               .valueLakhs,
-
         })
       );
 
-
     months.push({
-
       month,
 
       monthName:
@@ -3756,23 +2938,12 @@ export async function getYearlyFinalSummary(
 
       units:
         compactUnits,
-
     });
-
   }
-
-
-  // ====================================================
-  // FINAL YEAR RESPONSE
-  // ====================================================
-
   return {
-
     year,
-
     totalMonths:
       12,
-
     monthsWithData:
       months.filter(
         (month) =>
@@ -3786,9 +2957,7 @@ export async function getYearlyFinalSummary(
           !month.hasData
       )
         .length,
-
     months,
-
   };
 }
 

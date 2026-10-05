@@ -13,11 +13,6 @@ import {
   saveManualOccupancyBatch,
 } from "./occupancy.service.ts";
 
-
-// ======================================================
-// TYPES
-// ======================================================
-
 type ManualOccupancyItem = {
 
   unitCode?:
@@ -27,24 +22,6 @@ type ManualOccupancyItem = {
     unknown;
 
 };
-
-
-// ======================================================
-// VALIDATE MANUAL OCCUPANCY BODY
-//
-// Expected:
-//
-// {
-//   "occupancyDate": "2026-09-22",
-//   "occupancies": [
-//     { "unitCode": "MB", "occupancyCount": 120 },
-//     { "unitCode": "OS", "occupancyCount": 95 },
-//     ...
-//   ]
-// }
-//
-// Exactly 7 active unit entries are required.
-// ======================================================
 
 function getManualOccupancies(
   value: unknown
@@ -73,7 +50,6 @@ function getManualOccupancies(
     );
 
   }
-
 
   const occupancies =
     value.map(
@@ -128,25 +104,15 @@ function getManualOccupancies(
           throw new Error(
             `Valid whole-number occupancy is required for ${unitCode}`
           );
-
         }
-
-
         return {
 
           unitCode,
 
           occupancyCount,
-
         };
-
       }
     );
-
-
-  // ====================================================
-  // DUPLICATE UNIT CHECK
-  // ====================================================
 
   const uniqueUnits =
     new Set(
@@ -169,11 +135,6 @@ function getManualOccupancies(
     );
 
   }
-
-
-  // ====================================================
-  // MISSING UNIT CHECK
-  // ====================================================
 
   const missingUnits =
     REQUIRED_OCCUPANCY_UNITS
@@ -200,32 +161,8 @@ function getManualOccupancies(
 
   }
 
-
   return occupancies;
-
 }
-
-
-// ======================================================
-// SAVE MANUAL BED OCCUPANCY
-//
-// POST:
-// /api/v1/revenue/occupancy/manual
-//
-// JSON:
-// {
-//   occupancyDate: "2026-09-22",
-//   occupancies: [
-//     { unitCode: "MB", occupancyCount: 120 },
-//     { unitCode: "OS", occupancyCount: 95 },
-//     { unitCode: "SV", occupancyCount: 80 },
-//     { unitCode: "MS", occupancyCount: 100 },
-//     { unitCode: "BJ", occupancyCount: 58 },
-//     { unitCode: "JN", occupancyCount: 90 },
-//     { unitCode: "SM", occupancyCount: 65 }
-//   ]
-// }
-// ======================================================
 
 export async function saveManualOccupancy(
   req: Request,
@@ -240,13 +177,11 @@ export async function saveManualOccupancy(
           ?.occupancyDate
       );
 
-
     const occupancies =
       getManualOccupancies(
         req.body
           ?.occupancies
       );
-
 
     const result =
       await saveManualOccupancyBatch(
@@ -293,14 +228,6 @@ export async function saveManualOccupancy(
 
 }
 
-
-// ======================================================
-// GET DAILY OCCUPANCY
-//
-// GET:
-// /api/v1/revenue/occupancy?date=2026-09-22
-// ======================================================
-
 export async function getDailyOccupancy(
   req: Request,
   res: Response
@@ -314,12 +241,10 @@ export async function getDailyOccupancy(
           .date
       );
 
-
     const result =
       await getOccupancyByDate(
         occupancyDate
       );
-
 
     return res
       .status(200)
@@ -330,9 +255,7 @@ export async function getDailyOccupancy(
 
         data:
           result,
-
       });
-
   }
   catch (
     error
@@ -349,9 +272,6 @@ export async function getDailyOccupancy(
           error instanceof Error
             ? error.message
             : "Unable to get Occupancy data",
-
       });
-
   }
-
 }

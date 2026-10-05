@@ -2,11 +2,6 @@ import {
   parse,
 } from "csv-parse/sync";
 
-
-// ======================================================
-// ACTIVE OCCUPANCY UNITS
-// ======================================================
-
 export const OCCUPANCY_UNIT_CODES = [
   "MB",
   "OS",
@@ -17,16 +12,10 @@ export const OCCUPANCY_UNIT_CODES = [
   "SM",
 ] as const;
 
-
 export type OccupancyUnitCode =
   (
     typeof OCCUPANCY_UNIT_CODES
   )[number];
-
-
-// ======================================================
-// PARSED OCCUPANCY RESULT
-// ======================================================
 
 export interface ParsedOccupancyCsv {
 
@@ -47,11 +36,6 @@ export interface ParsedOccupancyCsv {
 
 }
 
-
-// ======================================================
-// NORMALIZE TEXT
-// ======================================================
-
 function normalizeText(
   value: unknown
 ): string {
@@ -66,11 +50,6 @@ function normalizeText(
     .trim();
 
 }
-
-
-// ======================================================
-// NORMALIZE HEADER
-// ======================================================
 
 function normalizeHeader(
   value: string
@@ -89,11 +68,6 @@ function normalizeHeader(
     );
 
 }
-
-
-// ======================================================
-// FIND COLUMN
-// ======================================================
 
 function findColumnName(
   headers: string[],
