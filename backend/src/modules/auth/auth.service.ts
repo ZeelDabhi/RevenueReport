@@ -13,11 +13,6 @@ import type {
   AuthUser,
 } from "./auth.types.ts";
 
-
-// ======================================================
-// VALID APPLICATION ROLES
-// ======================================================
-
 const VALID_USER_ROLES: AppUserRole[] = [
   "SUPER_ADMIN",
   "MASTER_ADMIN",
@@ -26,11 +21,6 @@ const VALID_USER_ROLES: AppUserRole[] = [
   "INCHARGE_DIRECTOR",
   "HO_USER",
 ];
-
-
-// ======================================================
-// JWT SECRET
-// ======================================================
 
 function getJwtSecret(): string {
 
@@ -51,15 +41,9 @@ function getJwtSecret(): string {
 
   }
 
-
   return secret;
 
 }
-
-
-// ======================================================
-// CREATE AUTH TOKEN
-// ======================================================
 
 export function createAuthToken(
   user: AuthUser
@@ -74,7 +58,6 @@ export function createAuthToken(
       process.env.JWT_EXPIRES_IN ||
       "12h"
     ) as SignOptions["expiresIn"];
-
 
   return jwt.sign(
     {
@@ -102,11 +85,6 @@ export function createAuthToken(
 
 }
 
-
-// ======================================================
-// VERIFY AUTH TOKEN
-// ======================================================
-
 export function verifyAuthToken(
   token: string
 ): AuthUser {
@@ -129,7 +107,6 @@ export function verifyAuthToken(
 
   }
 
-
   const userId =
     Number(
       decoded.userId
@@ -142,7 +119,6 @@ export function verifyAuthToken(
       ""
     ).trim();
 
-
   const role =
     String(
       decoded.role ??
@@ -150,7 +126,6 @@ export function verifyAuthToken(
     )
       .trim()
       .toUpperCase() as AppUserRole;
-
 
   const unitId =
     decoded.unitId === null ||
@@ -229,7 +204,6 @@ export function verifyAuthToken(
 
   }
 
-
   return {
 
     userId,
@@ -243,11 +217,6 @@ export function verifyAuthToken(
   };
 
 }
-
-
-// ======================================================
-// NORMALIZE USERNAME
-// ======================================================
 
 function normalizeUsername(
   usernameInput: unknown
@@ -264,11 +233,6 @@ function normalizeUsername(
     );
 
 }
-
-
-// ======================================================
-// LOGIN
-// ======================================================
 
 export async function loginUser(
   usernameInput: unknown,
@@ -308,7 +272,6 @@ export async function loginUser(
     );
 
   }
-
 
   const user =
     await prisma.user.findFirst({

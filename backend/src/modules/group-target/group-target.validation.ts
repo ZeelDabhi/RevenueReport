@@ -9,7 +9,6 @@ export function validateGroupTargetYear(
   const year =
     Number(value);
 
-
   if (
     !Number.isInteger(year) ||
     year < 2000 ||
@@ -21,15 +20,8 @@ export function validateGroupTargetYear(
     );
 
   }
-
-
   return year;
 }
-
-
-// ======================================================
-// MONTH VALIDATION
-// ======================================================
 
 export function validateGroupTargetMonth(
   value: unknown
@@ -37,7 +29,6 @@ export function validateGroupTargetMonth(
 
   const month =
     Number(value);
-
 
   if (
     !Number.isInteger(month) ||
@@ -48,17 +39,9 @@ export function validateGroupTargetMonth(
     throw new Error(
       "Month must be between 1 and 12"
     );
-
   }
-
-
   return month;
 }
-
-
-// ======================================================
-// GROUP TARGET VALIDATION
-// ======================================================
 
 export function validateGroupTargetLakhs(
   value: unknown
@@ -66,21 +49,17 @@ export function validateGroupTargetLakhs(
 
   const groupTargetLakhs =
     Number(value);
-
-
   if (
     !Number.isFinite(
       groupTargetLakhs
     ) ||
     groupTargetLakhs < 0
   ) {
-
     throw new Error(
       "Valid groupTargetLakhs is required"
     );
 
   }
-
 
   return groupTargetLakhs;
 }

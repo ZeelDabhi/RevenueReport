@@ -16,21 +16,6 @@ import type {
   AuthenticatedRequest,
 } from "./auth.types.ts";
 
-
-// ======================================================
-// AUTHENTICATION
-//
-// Every protected request must use JWT authentication.
-// No localhost / development Super Admin bypass.
-//
-// User identity is based on the signed userId.
-// Current username, role, unit and active status are
-// always reloaded from the database.
-//
-// Because username is editable, an old JWT username
-// does NOT invalidate the session by itself.
-// ======================================================
-
 export async function authenticateToken(
   req: AuthenticatedRequest,
   res: Response,
@@ -38,10 +23,6 @@ export async function authenticateToken(
 ) {
 
   try {
-
-    // ==================================================
-    // AUTHORIZATION HEADER
-    // ==================================================
 
     const authorization =
       String(
@@ -70,11 +51,6 @@ export async function authenticateToken(
 
     }
 
-
-    // ==================================================
-    // TOKEN
-    // ==================================================
-
     const token =
       authorization
         .substring(7)
@@ -99,20 +75,10 @@ export async function authenticateToken(
 
     }
 
-
-    // ==================================================
-    // VERIFY JWT
-    // ==================================================
-
     const tokenUser =
       verifyAuthToken(
         token
       );
-
-
-    // ==================================================
-    // CURRENT DATABASE USER
-    // ==================================================
 
     const currentUser =
       await prisma.user.findUnique({
@@ -145,11 +111,6 @@ export async function authenticateToken(
 
       });
 
-
-    // ==================================================
-    // USER EXISTS + ACTIVE
-    // ==================================================
-
     if (
       !currentUser ||
       !currentUser.isActive
@@ -168,11 +129,6 @@ export async function authenticateToken(
         });
 
     }
-
-
-    // ==================================================
-    // INCHARGE DIRECTOR MUST HAVE UNIT
-    // ==================================================
 
     if (
       currentUser.role ===
@@ -195,14 +151,6 @@ export async function authenticateToken(
 
     }
 
-
-    // ==================================================
-    // SET CURRENT AUTH USER
-    //
-    // IMPORTANT:
-    // Current username / role / unit come from database.
-    // ==================================================
-
     req.authUser = {
 
       userId:
@@ -218,7 +166,6 @@ export async function authenticateToken(
         currentUser.unitId,
 
     };
-
 
     return next();
 
@@ -241,11 +188,6 @@ export async function authenticateToken(
 
 }
 
-
-// ======================================================
-// ROLE AUTHORIZATION
-// ======================================================
-
 export function requireRoles(
   ...roles: AppUserRole[]
 ) {
@@ -258,11 +200,6 @@ export function requireRoles(
 
     const user =
       req.authUser;
-
-
-    // ==================================================
-    // AUTH REQUIRED
-    // ==================================================
 
     if (
       !user
@@ -281,11 +218,6 @@ export function requireRoles(
         });
 
     }
-
-
-    // ==================================================
-    // ROLE CHECK
-    // ==================================================
 
     if (
       !roles.includes(
@@ -306,7 +238,6 @@ export function requireRoles(
         });
 
     }
-
 
     return next();
 

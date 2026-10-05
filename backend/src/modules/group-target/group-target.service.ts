@@ -2,13 +2,6 @@ import {
   prisma,
 } from "../../config/database.ts";
 
-
-// ======================================================
-// SAVE / UPDATE GROUP TARGET
-//
-// One record per Year + Month
-// ======================================================
-
 export async function saveGroupTarget(
   year: number,
   month: number,
@@ -26,62 +19,34 @@ export async function saveGroupTarget(
             year,
             month,
           },
-
         },
-
-
         update: {
-
           groupTargetLakhs,
-
         },
-
-
         create: {
-
           year,
-
           month,
-
           groupTargetLakhs,
 
         },
-
       });
-
-
   return {
-
     id:
       saved.id,
-
     year:
       saved.year,
-
     month:
       saved.month,
-
     groupTargetLakhs:
       Number(
         saved.groupTargetLakhs
       ),
-
     createdAt:
       saved.createdAt,
-
     updatedAt:
       saved.updatedAt,
-
   };
 }
-
-
-// ======================================================
-// GET GROUP TARGET
-//
-// GET BY YEAR + MONTH
-// ======================================================
-
 export async function getGroupTarget(
   year: number,
   month: number
@@ -98,31 +63,19 @@ export async function getGroupTarget(
             year,
             month,
           },
-
         },
-
       });
 
-
   if (!record) {
-
     return {
-
       year,
-
       month,
-
       groupTargetLakhs:
         0,
-
       found:
         false,
-
     };
-
   }
-
-
   return {
 
     id:
@@ -147,6 +100,5 @@ export async function getGroupTarget(
 
     updatedAt:
       record.updatedAt,
-
   };
 }

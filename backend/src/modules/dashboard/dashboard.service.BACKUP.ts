@@ -2,11 +2,6 @@ import {
   prisma,
 } from "../../config/database.ts";
 
-
-// ======================================================
-// MONTH NAMES
-// ======================================================
-
 export const MONTH_NAMES = [
   "January",
   "February",
@@ -22,11 +17,6 @@ export const MONTH_NAMES = [
   "December",
 ];
 
-
-// ======================================================
-// UNIT ORDER
-// ======================================================
-
 export const UNIT_ORDER = [
   "MB",
   "OS",
@@ -36,17 +26,6 @@ export const UNIT_ORDER = [
   "JN",
   "SM",
 ];
-
-
-// ======================================================
-// OPTIONAL UNIT SCOPE
-//
-// Full-access roles call service functions without unitId.
-// INCHARGE_DIRECTOR passes its assigned unitId.
-//
-// This helper keeps every dashboard query restricted to
-// the logged-in Incharge Director's own unit.
-// ======================================================
 
 function buildActiveUnitWhere(
   unitId?: number
@@ -63,10 +42,6 @@ function buildActiveUnitWhere(
 }
 
 
-// ======================================================
-// ROUND 2 DECIMALS
-// ======================================================
-
 function round2(
   value: number
 ): number {
@@ -75,11 +50,6 @@ function round2(
     value.toFixed(2)
   );
 }
-
-
-// ======================================================
-// FORMAT DATE
-// ======================================================
 
 function formatDate(
   date: Date
@@ -97,7 +67,6 @@ function formatDate(
       "0"
     );
 
-
   const day =
     String(
       date.getUTCDate()
@@ -106,79 +75,41 @@ function formatDate(
       "0"
     );
 
-
   return `${year}-${month}-${day}`;
 }
-
-
-// ======================================================
-// NEXT DAY
-//
-// Revenue Dashboard rule:
-//
-// Dashboard Business Date = D
-// Current Bed Occupancy    = D + 1
-//
-// Example:
-// Dashboard 2026-09-22 uses Occupancy 2026-09-23.
-// ======================================================
 
 function getNextDay(
   date: Date
 ): Date {
-
   const nextDay =
     new Date(
       date.getTime()
     );
-
-
   nextDay.setUTCDate(
     nextDay.getUTCDate() +
       1
   );
-
-
   return nextDay;
 }
-
-
-// ======================================================
-// PREVIOUS DAY
-//
-// Used when mapping an actual Occupancy date back to the
-// Revenue Dashboard business date it belongs to.
-// ======================================================
 
 function getPreviousDay(
   date: Date
 ): Date {
-
   const previousDay =
     new Date(
       date.getTime()
-    );
-
-
+    )
   previousDay.setUTCDate(
     previousDay.getUTCDate() -
       1
   );
-
-
   return previousDay;
 }
-
-
-// ======================================================
-// MONTH START
-// ======================================================
 
 function getMonthStart(
   year: number,
   month: number
 ): Date {
-
   return new Date(
     Date.UTC(
       year,
@@ -187,11 +118,6 @@ function getMonthStart(
     )
   );
 }
-
-
-// ======================================================
-// NEXT MONTH START
-// ======================================================
 
 function getNextMonthStart(
   year: number,
@@ -207,15 +133,9 @@ function getNextMonthStart(
   );
 }
 
-
-// ======================================================
-// YEAR START
-// ======================================================
-
 function getYearStart(
   year: number
 ): Date {
-
   return new Date(
     Date.UTC(
       year,
@@ -224,11 +144,6 @@ function getYearStart(
     )
   );
 }
-
-
-// ======================================================
-// NEXT YEAR START
-// ======================================================
 
 function getNextYearStart(
   year: number
@@ -242,11 +157,6 @@ function getNextYearStart(
     )
   );
 }
-
-
-// ======================================================
-// SORT UNITS
-// ======================================================
 
 function sortUnits(
   units: any[]
@@ -267,31 +177,6 @@ function sortUnits(
   );
 }
 
-
-// ======================================================
-// BUILD DASHBOARD SNAPSHOT
-//
-// Used by:
-//
-// 1. Exact Date Dashboard
-// 2. Date Range Dashboard
-// 3. Monthly Final Summary
-// 4. Yearly Summary
-//
-// OCCUPANCY RULE:
-//
-// Dashboard Business Date = D
-// Current Occupancy        = D + 1
-//
-// FORMULAS:
-//
-// PROJ = MTD ÷ Selected Day × Month Days
-//
-// GAP = PROJ - Unit TGT
-//
-// GRAND GAP = Grand PROJ - Group TGT
-// ======================================================
-
 function buildDashboardSnapshot(
   selectedDate: Date,
   unitsInput: any[],
@@ -300,22 +185,19 @@ function buildDashboardSnapshot(
   groupTarget: any,
   occupancyRecords: any[],
   unitId?: number
-) {
-
+)
+ {
   const year =
     selectedDate
       .getUTCFullYear();
-
 
   const month =
     selectedDate
       .getUTCMonth() + 1;
 
-
   const selectedDay =
     selectedDate
       .getUTCDate();
-
 
   const totalDaysInMonth =
     new Date(
@@ -327,25 +209,16 @@ function buildDashboardSnapshot(
     )
       .getUTCDate();
 
-
   const units =
     sortUnits(
       unitsInput
     );
-
-
-  // ====================================================
-  // REVENUE MAP
-  //
-  // unitId-reportType
-  // ====================================================
 
   const revenueMap =
     new Map<
       string,
       any
     >();
-
 
   for (
     const report
@@ -359,17 +232,11 @@ function buildDashboardSnapshot(
 
   }
 
-
-  // ====================================================
-  // TARGET MAP
-  // ====================================================
-
   const targetMap =
     new Map<
       number,
       any
     >();
-
 
   for (
     const target
@@ -382,11 +249,6 @@ function buildDashboardSnapshot(
     );
 
   }
-
-
-  // ====================================================
-  // OCCUPANCY MAP
-  // ====================================================
 
   const occupancyMap =
     new Map<
@@ -407,11 +269,6 @@ function buildDashboardSnapshot(
 
   }
 
-
-  // ====================================================
-  // UNIT TABLE
-  // ====================================================
-
   const unitDashboard =
     units.map(
       (unit) => {
@@ -421,35 +278,26 @@ function buildDashboardSnapshot(
             `${unit.id}-FTD`
           );
 
-
         const MTD =
           revenueMap.get(
             `${unit.id}-MTD`
           );
-
 
         const LMTD =
           revenueMap.get(
             `${unit.id}-LMTD`
           );
 
-
         const target =
           targetMap.get(
             unit.id
           );
 
-
         const occupancy =
           occupancyMap.get(
             unit.id
           );
-
-
-        // ===============================================
-        // VALUES
-        // ===============================================
-
+          
         const ftdLakhs =
           FTD
             ? Number(

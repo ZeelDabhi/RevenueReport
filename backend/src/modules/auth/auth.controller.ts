@@ -15,11 +15,6 @@ import type {
   AuthenticatedRequest,
 } from "./auth.types.ts";
 
-
-// ======================================================
-// LOGIN
-// ======================================================
-
 export async function login(
   req: Request,
   res: Response
@@ -32,7 +27,6 @@ export async function login(
         req.body?.username,
         req.body?.password
       );
-
 
     return res
       .status(200)
@@ -65,11 +59,6 @@ export async function login(
 
 }
 
-
-// ======================================================
-// CURRENT USER
-// ======================================================
-
 export async function getMe(
   req: AuthenticatedRequest,
   res: Response
@@ -98,8 +87,6 @@ export async function getMe(
         });
 
     }
-
-
     const user =
       await prisma.user.findUnique({
 
