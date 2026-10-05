@@ -76,17 +76,6 @@ function normalizeText(
 
 }
 
-
-// ======================================================
-// CHECK SHORT UNIT CODE IN FILE NAME
-//
-// Example:
-//
-// MB_report.csv
-// report_MB.csv
-// report-OS-123.csv
-// ======================================================
-
 function containsUnitCode(
   text: string,
   code: UnitCode
@@ -104,20 +93,6 @@ function containsUnitCode(
   );
 
 }
-
-
-// ======================================================
-// CHECK WHETHER FILE LOOKS LIKE
-// HIMS REVENUE CSV
-//
-// Required columns:
-//
-// Revenue On
-// Total Net Amount
-//
-// This fallback is used only when
-// unit identity is not present in file.
-// ======================================================
 
 function isRevenueCsv(
   fileBuffer: Buffer
@@ -265,11 +240,6 @@ export function detectUnitFromFile(
 
 }
 
-
-// ======================================================
-// VALIDATE SELECTED UNIT VS UPLOADED FILE
-// ======================================================
-
 export function validateUnitFile(
   selectedUnitCode: string,
   file: Express.Multer.File
@@ -325,13 +295,6 @@ export function validateUnitFile(
     );
 
 
-  // ----------------------------------------------------
-  // UNIT FOUND IN FILE
-  //
-  // If detected unit exists,
-  // it MUST match selected unit.
-  // ----------------------------------------------------
-
   if (
     detectedUnit
   ) {
@@ -351,23 +314,6 @@ export function validateUnitFile(
     return detectedUnit;
 
   }
-
-
-  // ----------------------------------------------------
-  // UNIT IDENTITY NOT FOUND
-  //
-  // HIMS revenue files may not contain
-  // hospital/unit name.
-  //
-  // In that case:
-  //
-  // Revenue On +
-  // Total Net Amount
-  //
-  // must exist.
-  //
-  // Then selected unit is trusted.
-  // ----------------------------------------------------
 
   const validRevenueStructure =
     isRevenueCsv(

@@ -23,363 +23,55 @@ const CREATABLE_ROLES: AppUserRole[] = [
   "INCHARGE_DIRECTOR",
 ];
 const PUBLIC_USER_SELECT = {
-
-
-
-
-
-
-
   id: true,
-
-
-
-
-
-
-
   name: true,
-
-
-
-
-
-
-
   username: true,
-
-
-
-
-
-
-
   email: true,
-
-
-
-
-
-
-
   mobile: true,
-
-
-
-
-
-
-
-  role: true,
-
-
-
-
-
-
-
+  role: true ,
   unitId: true,
-
-
-
-
-
-
-
   isActive: true,
-
-
-
-
-
-
-
   lastLoginAt: true,
-
-
-
-
-
-
-
   createdAt: true,
-
-
-
-
-
-
-
   updatedAt: true,
-
-
-
-
-
-
-
   unit: {
-
-
-
-
-
-
-
     select: {
-
-
-
-
-
-
-
       code: true,
-
-
-
-
-
-
-
       name: true,
-
-
-
-
-
-
-
     },
-
-
-
-
-
-
-
   },
-
-
-
-
-
-
-
 } as const;
-
-
-
-
-
 const SUPER_ADMIN_USER_SELECT = {
-
-
-
   ...PUBLIC_USER_SELECT,
-
-
-
   passwordChangedAt: true,
-
-
-
   passwordChangedBy: true,
-
-
-
 } as const;
-
-
-
-
-
-
-
-
-
-
-
-// ======================================================
-
-
-
-// ACCESS HELPERS
-
-
-
-// ======================================================
-
-
-
-
-
-
-
 function hasFullUserManagementAccess(
-
-
-
   role: AppUserRole
-
-
-
 ): boolean {
-
-
-
-
-
-
-
   return FULL_MANAGEMENT_ROLES.includes(
-
-
-
     role
-
-
-
   );
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
 function ensureAuthenticated(
-
-
-
   req: AuthenticatedRequest
-
-
-
 ) {
-
-
-
-
-
-
-
   const actor =
-
-
-
     req.authUser;
-
-
-
-
-
-
-
-
-
-
-
   if (
-
-
-
     !actor
-
-
-
   ) {
-
-
-
-
-
-
-
     throw new Error(
-
-
-
       "Authentication required"
-
-
-
     );
-
-
-
-
-
-
-
   }
-
-
-
-
-
-
-
-
-
-
-
   return actor;
-
-
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
 function ensureFullManagementAccess(
-
-
-
   req: AuthenticatedRequest
-
-
-
 ) {
-
-
-
-
-
-
-
   const actor =
-
-
-
-    ensureAuthenticated(
-
-
-
+   ensureAuthenticated(
       req
 
 
@@ -10443,241 +10135,45 @@ export async function deleteUser(
             true,
         },
       });
-
-
-
-
-
-
-
-
-
-
-
     if (
-
-
-
       !target
-
-
-
     ) {
-
-
-
-
-
-
-
       return res
-
-
-
         .status(404)
-
-
-
         .json({
-
-
-
-
-
-
-
           success:
-
-
-
             false,
-
-
-
-
-
-
-
           message:
-
-
-
             "User not found",
-
-
-
-
-
-
-
         });
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
     if (
-
-
-
       target.role ===
-
-
-
         "SUPER_ADMIN" &&
-
-
-
       target.isActive
 
-
-
     ) {
-
-
-
-
-
-
-
       await ensureAnotherActiveSuperAdminExists(
-
-
-
         target.id
-
-
-
       );
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
     await prisma.user.delete({
-
-
-
-
-
-
-
       where: {
-
-
-
-
-
-
-
         id:
-
-
-
           userId,
-
-
-
-
-
-
-
       },
-
-
-
-
-
-
-
     });
-
-
-
-
-
-
-
-
-
-
-
     return res
-
-
 
       .status(200)
 
-
-
       .json({
 
-
-
-
-
-
-
         success:
-
-
-
           true,
-
-
-
-
-
-
-
         message:
-
-
-
           "User deleted successfully",
-
-
-
-
-
-
-
         data: {
-
-
-
-
-
-
-
           id:
 
 
