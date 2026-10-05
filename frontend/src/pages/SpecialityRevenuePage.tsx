@@ -7264,11 +7264,9 @@ function SpecialityRevenuePage() {
 
             </div>
 
-
             {
               renderSummary()
             }
-
 
             <section className="sr-table-card">
 
@@ -7280,10 +7278,7 @@ function SpecialityRevenuePage() {
                     Speciality Wise Revenue
                   </h2>
 
-
-
                 </div>
-
 
                 {
                   responseMode ===

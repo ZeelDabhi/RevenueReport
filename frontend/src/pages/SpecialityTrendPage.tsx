@@ -3855,7 +3855,6 @@ function SpecialityTrendPage() {
                                   row.speciality ===
                                   selectedSpeciality;
 
-
                                 return (
 
                                   <div

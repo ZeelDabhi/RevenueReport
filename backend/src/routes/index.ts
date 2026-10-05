@@ -248,20 +248,6 @@ router.use(
   authenticateToken
 );
 
-
-// ======================================================
-// SPECIALITY REVENUE
-//
-// GET
-// /api/v1/speciality/dashboard?date=2026-09-23
-//
-// Full-access roles can optionally use:
-// /api/v1/speciality/dashboard?date=2026-09-23&unit=MB
-//
-// INCHARGE_DIRECTOR:
-// own assigned unit only.
-// ======================================================
-
 router.use(
   "/speciality",
   specialityRoutes
